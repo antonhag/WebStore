@@ -1,9 +1,15 @@
-﻿namespace WebStore;
+﻿using WebStore.GUI;
+
+namespace WebStore;
 
 class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        HomeView homeView = new HomeView();
+
+        homeView.Show();
+
+        Console.ReadKey();
     }
 }
