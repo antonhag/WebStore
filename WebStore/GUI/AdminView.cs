@@ -20,7 +20,7 @@ public class AdminView
             adminOptions.Add($"{i}. {Enum.GetName(typeof(AdminMenu), i).Replace("_", " ")}");
         }
 
-        var adminWindow = new Window("Admin", 2, 4, adminOptions);
+        var adminWindow = new Window("Admin", 2, 2, adminOptions);
         
         adminWindow.Draw();
     }
