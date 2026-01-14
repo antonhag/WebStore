@@ -6,6 +6,7 @@ public class Window
     public int Left { get; set; }
     public int Top { get; set; }
     public List<string> TextRows { get; set; }
+    // public int? Width { get; set; }
 
     public Window(string header, int left, int top, List<string> textRows)
     {
@@ -13,6 +14,7 @@ public class Window
         Left = left;
         Top = top;
         TextRows = textRows;
+        // Width = width;
     }
 
     public void Draw()

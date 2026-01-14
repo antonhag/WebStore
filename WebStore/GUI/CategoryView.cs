@@ -1,26 +1,30 @@
+using Dapper;
+using Microsoft.Data.SqlClient;
+using WebStore.Data;
+using WebStore.Models;
+
 namespace WebStore.GUI;
 
 public class CategoryView
 {
-    public enum Categories
-    {
-        Tröjor = 1,
-        Skjortor,
-        Byxor,
-        Skor,
-        Återgå_till_menyn = 9
-    }
-
-    public static void Show()
+    public static async Task ShowAsync()
     {
         var categoryList = new List<string>();
+        
+        var connectionString = "Server=localhost,14330;Database=WebStoreDb;User Id=sa;Password=StrongP@ssw0rd!;TrustServerCertificate=True;";
 
-        foreach (int i in Enum.GetValues(typeof(Categories)))
+        using (var connection = new SqlConnection(connectionString))
         {
-            categoryList.Add($"{i}. {Enum.GetName(typeof(Categories), i).Replace("_", " ")}");
-        }
+            var sql = "SELECT Id, Name FROM webstore.Categories";
+            
+            var categories = await connection.QueryAsync<Category>(sql);
 
-        var categoryWindow = new Window("Kategorier", 2, 10, categoryList);
+            foreach (var category in categories)
+            {
+                categoryList.Add($"{category.Id}. {category.Name}");
+            }
+        }
+        var categoryWindow = new Window ("Kategorier", 2, 10, categoryList);
         
         categoryWindow.Draw();
     }

@@ -6,7 +6,7 @@ public class HomeController : ControllerBase
 {
     protected override void DrawView()
     {
-        HomeView.Show();
+        HeaderView.Show();
         CustomerView.Show();
     }
 
