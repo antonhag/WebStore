@@ -1,4 +1,5 @@
-﻿using WebStore.GUI;
+﻿using WebStore.Data;
+using WebStore.GUI;
 
 namespace WebStore;
 
