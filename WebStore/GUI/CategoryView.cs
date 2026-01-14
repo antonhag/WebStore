@@ -23,6 +23,7 @@ public class CategoryView
             {
                 categoryList.Add($"{category.Id}. {category.Name}");
             }
+            categoryList.Add("9. För att gå tillbaka till menyn");
         }
         var categoryWindow = new Window ("Kategorier", 2, 10, categoryList);
         
