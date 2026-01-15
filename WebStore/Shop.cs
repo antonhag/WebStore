@@ -7,7 +7,8 @@ public static class Shop
 {
     public static void Run()
     {
-        HomeController homeController = new HomeController();
-        homeController.Run();
+        var loginController = new LoginController();
+        loginController.Run();
+        //homeController.Run();
     }
 }

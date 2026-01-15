@@ -6,8 +6,7 @@ public class CustomerView
     {
         Startsida = 1,
         Shoppen,
-        Varukorgen,
-        Logga_in
+        Varukorgen
     }
 
     public static void Show()
