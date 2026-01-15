@@ -32,7 +32,7 @@ public class HomeController : ControllerBase
                 new CategoryController().Run();
                 return true;
             case ConsoleKey.D3:
-                //ToDO
+                new CartController().Run();
                 return true;
             case ConsoleKey.D4:
                 //ToDo

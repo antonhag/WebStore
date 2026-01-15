@@ -18,7 +18,7 @@ public class LoginController : ControllerBase
         switch (key)
         {
             case ConsoleKey.D1:
-                LoginCustomer();
+                LoginCustomer(); 
                 return true;
             case ConsoleKey.D2:
                 new AdminController().Run();

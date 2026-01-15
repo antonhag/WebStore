@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using WebStore.Data;
 using WebStore.GUI;
+using WebStore.Models;
 
 namespace WebStore.Controllers;
 
@@ -34,7 +36,7 @@ public class ProductController : ControllerBase
 
             if (key2 == ConsoleKey.B)
             {
-                
+                BuyProduct(productId);
             }
             return true;
         }
@@ -58,8 +60,53 @@ public class ProductController : ControllerBase
         }
     }
 
-    private void BuyProduct(int productId)
+    private void BuyProduct(int  productId)
     {
+        using var db = new WebStoreContext();
         
+        var quantity = ProductListView.BuyProductView(productId);
+
+        if (Session.CurrentCustomer == null)
+        {
+            ShowError("Du måste vara inloggad för att handla");
+            return;
+        }
+                
+        var customerId = Session.CurrentCustomer.Id;
+                
+        var cart = db.Carts.Include(c => c.Items).FirstOrDefault(c => c.CustomerId == customerId);
+        if (cart == null)
+        {
+            cart = new Cart
+            {
+                CustomerId = customerId
+            };
+                    
+            db.Carts.Add(cart);
+            db.SaveChanges();
+        }
+        
+        var product = db.Products.First(p => p.Id == productId);
+        
+        var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+
+        if (existingItem != null)
+        {
+            existingItem.Quantity += quantity;
+            existingItem.TotalPrice = existingItem.Quantity * product.Price;
+        }
+        else
+        {
+            var cartItem = new CartItem
+            {
+                CartId = cart.Id,
+                ProductId = productId,
+                Quantity = quantity,
+                TotalPrice = quantity * product.Price
+            };
+            
+            cart.Items.Add(cartItem);
+        }
+        db.SaveChanges();
     }
 }
