@@ -10,4 +10,10 @@ public class Customer
     public string Password { get; set; } = null!;
     public DateTime BirthDate { get; set; }
     public string? Street { get; set; } 
+    
+    public int? CityId { get; set; }
+    public virtual City? City { get; set; }
+    
+    
+    
 }
