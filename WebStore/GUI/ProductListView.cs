@@ -7,6 +7,8 @@ public class ProductListView
 {
     public static void Show(int categoryId)
     {
+        Console.Clear();
+        HeaderView.Show();
         var productList = new List<string>();
 
         using (var db = new WebStoreContext())
@@ -30,6 +32,8 @@ public class ProductListView
 
     public static void ShowDetails(int productId)
     {
+        Console.Clear();
+        HeaderView.Show();
         using var db = new WebStoreContext();
         var product = db.Products.FirstOrDefault(p => p.Id == productId);
 
@@ -94,20 +98,21 @@ public class ProductListView
             }
         }
 
-        var confirmationWindow = new Window("Tillagd i varukorgen", 2, 18,
+        var confirmationWindow = new Window("Tillagd i varukorgen", 2, 10,
             new List<string>
             {
                 $"{quantity} av varan {product.Name} har lagts till i varukorgen",
                 "Tryck valfri knapp för att gå vidare..."
             });
         Console.Clear();
+        HeaderView.Show();
         confirmationWindow.Draw();
         Console.ReadKey(true);
 
         return quantity;
     }
 
-    public static void StockErrorView(Product product, int quantity)
+    private static void StockErrorView(Product product, int quantity)
     {
         var rows = new List<string>();
         

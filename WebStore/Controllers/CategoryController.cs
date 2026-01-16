@@ -1,4 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using WebStore.Data;
 using WebStore.GUI;
+using WebStore.Models;
 
 namespace WebStore.Controllers;
 
@@ -29,20 +32,19 @@ public class CategoryController : ControllerBase
                 //ToDO
                 return true;
             case ConsoleKey.D1:
-                int selectedCategoryId = 1;
-                new ProductController(selectedCategoryId).Run();
+                new ProductController(1).Run();
                 return true;
             case ConsoleKey.D2:
-                int selectedCategoryId2 = 2;
-                new ProductController(selectedCategoryId2).Run();
+                new ProductController(2).Run();
                 return true;
             case ConsoleKey.D3:
-                int selectedCategoryId3 = 3;
-                new ProductController(selectedCategoryId3).Run();
+                new ProductController(3).Run();
                 return true;
             case ConsoleKey.D4:
-                int selectedCategoryId4 = 4;
-                new ProductController(selectedCategoryId4).Run();
+                new ProductController(4).Run();
+                return true;
+            case ConsoleKey.S:
+                SearchProduct();
                 return true;
             case ConsoleKey.D9:
                 return false;
@@ -50,5 +52,103 @@ public class CategoryController : ControllerBase
                 ShowError("Ogiltigt val!");
                 return true;
         }
+    }
+
+    private void SearchProduct()
+    {
+        var productName = CategoryView.SearchView();
+        
+        using var db = new WebStoreContext();
+        // Söker i databasen efter produkter vars namn innehåller det som användaren skrev (fritextsökning).
+        var products = db.Products.Where(p => EF.Functions.Like(p.Name, $"%{productName}%")).OrderBy(p => p.Name).ToList();
+
+        if (products.Count < 1)
+        {
+            CategoryView.SearchError("Varan hittades ej");
+            Console.ReadKey(true);
+            return;
+        }
+        
+        CategoryView.ShowSearchResults(products);
+        HandleSearchInput(products);
+    }
+
+    private void HandleSearchInput(List<Product> searchedProducts)
+    {
+        var key = Console.ReadKey(true).Key;
+        int selectedIndex = (int)key - (int)ConsoleKey.D0; // D1 numeriska värde = 49. D1(49) - D0(48) = 1. D2(50) - D0(48) = 2 osv...
+
+        if (selectedIndex > 0 && selectedIndex <= searchedProducts.Count)
+        {
+            int productId = searchedProducts[selectedIndex - 1].Id;
+            
+            ProductListView.ShowDetails(productId);
+            var key2 = Console.ReadKey(true).Key;
+
+            if (key2 == ConsoleKey.B)
+            {
+                BuyProduct(productId);
+            }
+        }
+        else if (key == ConsoleKey.D9)
+        {
+            return;
+        }
+    }
+    
+    private void BuyProduct(int productId)
+    {
+        using var db = new WebStoreContext();
+
+        if (Session.CurrentCustomer == null)
+        {
+            ShowError("Du måste vara inloggad för att handla");
+            return;
+        }
+
+        var quantity = ProductListView.BuyProductView(productId);
+        if (quantity <= 0)
+            return;
+
+        var product = db.Products.First(p => p.Id == productId);
+
+        if (product.StockQuantity < quantity)
+        {
+            ProductListView.BuyProductView(productId);
+            return;
+        }
+
+        var customerId = Session.CurrentCustomer.Id;
+
+        var cart = db.Carts
+            .Include(c => c.Items)
+            .FirstOrDefault(c => c.CustomerId == customerId);
+
+        if (cart == null)
+        {
+            cart = new Cart { CustomerId = customerId };
+            db.Carts.Add(cart);
+            db.SaveChanges();
+        }
+
+        var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+
+        if (existingItem != null)
+        {
+            existingItem.Quantity += quantity;
+            existingItem.TotalPrice = existingItem.Quantity * product.Price;
+        }
+        else
+        {
+            cart.Items.Add(new CartItem
+            {
+                ProductId = productId,
+                Quantity = quantity,
+                TotalPrice = quantity * product.Price
+            });
+        }
+
+        product.StockQuantity -= quantity;
+        db.SaveChanges();
     }
 }

@@ -60,7 +60,7 @@ public class ProductController : ControllerBase
         }
     }
 
-    private void BuyProduct(int  productId)
+    private void BuyProduct(int productId)
     {
         using var db = new WebStoreContext();
 
