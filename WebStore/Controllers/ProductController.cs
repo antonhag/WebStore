@@ -63,31 +63,38 @@ public class ProductController : ControllerBase
     private void BuyProduct(int  productId)
     {
         using var db = new WebStoreContext();
-        
-        var quantity = ProductListView.BuyProductView(productId);
 
         if (Session.CurrentCustomer == null)
         {
             ShowError("Du måste vara inloggad för att handla");
             return;
         }
-                
+
+        var quantity = ProductListView.BuyProductView(productId);
+        if (quantity <= 0)
+            return;
+
+        var product = db.Products.First(p => p.Id == productId);
+
+        if (product.StockQuantity < quantity)
+        {
+            ProductListView.BuyProductView(productId);
+            return;
+        }
+
         var customerId = Session.CurrentCustomer.Id;
-                
-        var cart = db.Carts.Include(c => c.Items).FirstOrDefault(c => c.CustomerId == customerId);
+
+        var cart = db.Carts
+            .Include(c => c.Items)
+            .FirstOrDefault(c => c.CustomerId == customerId);
+
         if (cart == null)
         {
-            cart = new Cart
-            {
-                CustomerId = customerId
-            };
-                    
+            cart = new Cart { CustomerId = customerId };
             db.Carts.Add(cart);
             db.SaveChanges();
         }
-        
-        var product = db.Products.First(p => p.Id == productId);
-        
+
         var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
 
         if (existingItem != null)
@@ -97,16 +104,15 @@ public class ProductController : ControllerBase
         }
         else
         {
-            var cartItem = new CartItem
+            cart.Items.Add(new CartItem
             {
-                CartId = cart.Id,
                 ProductId = productId,
                 Quantity = quantity,
                 TotalPrice = quantity * product.Price
-            };
-            
-            cart.Items.Add(cartItem);
+            });
         }
+
+        product.StockQuantity -= quantity;
         db.SaveChanges();
     }
 }

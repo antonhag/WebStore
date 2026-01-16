@@ -188,6 +188,9 @@ namespace WebStore.Migrations
                     b.Property<bool>("SelectedProduct")
                         .HasColumnType("bit");
 
+                    b.Property<int>("StockQuantity")
+                        .HasColumnType("int");
+
                     b.Property<string>("Supplier")
                         .HasColumnType("nvarchar(max)");
 
