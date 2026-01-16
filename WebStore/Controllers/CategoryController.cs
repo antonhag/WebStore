@@ -111,13 +111,7 @@ public class CategoryController : ControllerBase
             return;
 
         var product = db.Products.First(p => p.Id == productId);
-
-        if (product.StockQuantity < quantity)
-        {
-            ProductListView.BuyProductView(productId);
-            return;
-        }
-
+        
         var customerId = Session.CurrentCustomer.Id;
 
         var cart = db.Carts

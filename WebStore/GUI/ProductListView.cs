@@ -71,44 +71,40 @@ public class ProductListView
         }
 
         int quantity = 0;
-        bool validInput = false;
 
-        while (!validInput)
+        while (true)
         {
-            var buyWindow = new Window($"Antal av: {product.Name}", 2, 18, new List<string> { "Ange antal: " });
+            Console.Clear();
+            HeaderView.Show();
+            ShowDetails(product.Id);
+            var buyWindow = new Window($"Antal av: {product.Name}", 2, 18, new List<string> { "Ange antal: ", "[0] För att avbryta" });
             buyWindow.Draw();
 
             Console.SetCursorPosition(17, 19);
             var input = Console.ReadLine();
-            if (int.TryParse(input, out quantity) && quantity > 0)
+            
+            if (!int.TryParse(input, out quantity) || quantity < 0)
             {
-                validInput = true;
-                
-                if (product.StockQuantity < quantity)
-                {
-                    StockErrorView(product, quantity);
-                    Console.ReadKey();
-                    return 0;
-                }
+              ShowInvalidQuantity();
+              continue;
             }
-            else
+
+            if (quantity == 0)
             {
-                buyWindow = new Window("Fel antal", 2, 21, new List<string> { "Du måste ange minst 1" });
-                buyWindow.Draw();
+                return 0;
             }
+            
+            if (product.StockQuantity < quantity)
+            {
+                StockErrorView(product, quantity);
+                Console.ReadKey(true);
+                continue;
+            }
+            
+            break;
         }
-
-        var confirmationWindow = new Window("Tillagd i varukorgen", 2, 10,
-            new List<string>
-            {
-                $"{quantity} av varan {product.Name} har lagts till i varukorgen",
-                "Tryck valfri knapp för att gå vidare..."
-            });
-        Console.Clear();
-        HeaderView.Show();
-        confirmationWindow.Draw();
-        Console.ReadKey(true);
-
+        
+        ShowConfirmation(product, quantity);
         return quantity;
     }
 
@@ -124,10 +120,34 @@ public class ProductListView
         else if (product.StockQuantity < quantity)
         {
             rows.Add($"Tyvärr, det finns endast {product.StockQuantity} kvar av {product.Name}, välj ett lägre antal.");
-            rows.Add($"Tryck valfri knapp för att gå vidare...");
+            rows.Add($"Tryck valfri knapp för att gå tillbaka...");
         }
 
         var errorWindow = new Window("Fel", 2, 18, rows);
         errorWindow.Draw();
+    }
+
+    private static void ShowInvalidQuantity()
+    {
+        var window = new Window ("Fel", 2, 18, new List<string> { "Du måste ange ett giltigt antal", "Tryck valfri knapp för att gå tillbaka..." });
+        window.Draw();
+        Console.ReadKey(true);
+    }
+
+    private static void ShowConfirmation(Product product, int quantity)
+    {
+        Console.Clear();
+        HeaderView.Show();
+        
+        var confirmationWindow = new Window("Tillagd i varukorgen", 2, 10,
+            new List<string>
+            {
+                $"{quantity} av varan {product.Name} har lagts till i varukorgen",
+                "Tryck valfri knapp för att gå vidare..."
+            });
+        
+        confirmationWindow.Draw();
+        Console.ReadKey(true);
+        
     }
 }
