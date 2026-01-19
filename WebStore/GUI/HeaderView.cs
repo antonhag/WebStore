@@ -6,8 +6,7 @@ public class HeaderView
 {
     public static void Show()
     {
-        var header = new Window($"Välkommen till Hags Kläder {Session.CurrentCustomer.FirstName}!", 2, 1, new List<string> { "Trender som håller, pris som inte slår hål!" });
-        header.Draw();
+        ShowShopName();
 
         var dealList = new List<string>();
         
@@ -40,6 +39,12 @@ public class HeaderView
                 buttonKey++;
             }
         }
+    }
+
+    public static void ShowShopName()
+    {
+        var header = new Window($"Hags Kläder", 2, 1, new List<string> { "Trender som håller, pris som inte slår hål!" });
+        header.Draw();
     }
 }
 

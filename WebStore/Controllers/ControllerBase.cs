@@ -1,3 +1,5 @@
+using WebStore.Data;
+
 namespace WebStore.Controllers;
 
 public abstract class ControllerBase
@@ -18,7 +20,6 @@ public abstract class ControllerBase
             {
              ShowError("Ogiltigt val!");
             }
-            
         }
     }
     

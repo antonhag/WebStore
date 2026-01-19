@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WebStore.Data;
 using WebStore.GUI;
 
@@ -19,7 +20,7 @@ public class LoginController : ControllerBase
         {
             case ConsoleKey.D1:
                 LoginCustomer(); 
-                return true;
+                return true;    
             case ConsoleKey.D2:
                 new AdminController().Run();
                 return true;
@@ -41,7 +42,7 @@ public class LoginController : ControllerBase
         
         var (email, password) = LoginView.GetCredentials();
 
-        var customer = db.Customers.FirstOrDefault(c => c.Email == email && c.Password == password);
+        var customer = db.Customers.Include(c=> c.City).ThenInclude(ci => ci.Country).FirstOrDefault(c => c.Email == email && c.Password == password);
 
         if (customer != null)
         {

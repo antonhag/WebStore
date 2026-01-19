@@ -11,8 +11,7 @@ public class LoginView
 
     public static void Show()
     {
-        var header = new Window($"Hags Kläder", 2, 1, new List<string> { "Trender som håller, pris som inte slår hål!" });
-        header.Draw();
+        HeaderView.ShowShopName();
         
         var loginOptions = new List<string>();
 

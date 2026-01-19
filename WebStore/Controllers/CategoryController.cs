@@ -49,7 +49,7 @@ public class CategoryController : ControllerBase
             case ConsoleKey.D9:
                 return false;
             default:
-                ShowError("Ogiltigt val!");
+                ShowError("Ogiltigt val KATEGORI!");
                 return true;
         }
     }
