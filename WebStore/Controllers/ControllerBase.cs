@@ -16,9 +16,20 @@ public abstract class ControllerBase
                 DrawView();
                 running = HandleInput();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-             ShowError("Ogiltigt val!");
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Ogiltigt val! BASE");
+                Console.WriteLine("Felmeddelande:");
+                Console.WriteLine(ex.Message);
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine("InnerException:");
+                    Console.WriteLine(ex.InnerException.Message);
+                }
+                Console.WriteLine("\nTryck valfri knapp för att fortsätta...");
+                Console.ReadKey(true);
             }
         }
     }

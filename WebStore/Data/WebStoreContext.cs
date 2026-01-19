@@ -13,6 +13,7 @@ public class WebStoreContext : DbContext
     public DbSet<City> Cities { get; set; } = null!;
     public DbSet<Country> Countries { get; set; } = null!;
     public DbSet<Order> Orders { get; set; } = null!;
+    public DbSet<OrderItem> OrderItems { get; set; } = null!;
     public DbSet<PaymentMethod> PaymentMethods { get; set; } = null!;
     public DbSet<DeliveryOption> DeliveryOptions { get; set; } = null!;
     public DbSet<CreditCard> CreditCards { get; set; } = null!;

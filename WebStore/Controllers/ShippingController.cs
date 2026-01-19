@@ -74,5 +74,7 @@ public class ShippingController : ControllerBase
         }
         
         Session.SelectedDeliveryOption = deliveryOption;
+
+        new CheckoutController().Run();
     }
 }

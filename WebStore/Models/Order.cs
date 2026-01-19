@@ -19,5 +19,5 @@ public class Order
     public virtual PaymentMethod PaymentMethod { get; set; } = null!;
     public virtual DeliveryOption DeliveryOption { get; set; } = null!;
     public virtual City DeliveryCity { get; set; } = null!;
-    public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }
