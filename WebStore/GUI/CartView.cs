@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WebStore.Controllers;
 using WebStore.Data;
 using WebStore.Models;
 
@@ -17,7 +18,7 @@ public class CartView
         
         using var db = new WebStoreContext();
         
-        var cart = db.Carts.Include(c => c.Items).ThenInclude(i => i.Product).FirstOrDefault(c => c.Id == Session.CurrentCustomer.Id);
+        var cart = db.Carts.Include(c => c.Items).ThenInclude(i => i.Product).FirstOrDefault(c => c.CustomerId == Session.CurrentCustomer.Id);
 
         if (cart == null || cart.Items.Count == 0)
         {
@@ -25,6 +26,8 @@ public class CartView
                 new List<string> { "Din varukorg är tom", "Tryck valfri knapp för att gå tillbaka" });
             emptyWindow.Draw();
             Console.ReadKey(true);
+            
+            new HomeController().Run();
         }
 
         var rows = new List<string>();

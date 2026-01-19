@@ -13,7 +13,7 @@ public class CheckoutView
 
         using var db = new WebStoreContext();
         
-        var checkoutCart = db.Carts.Include(c => c.Items).ThenInclude(i => i.Product).FirstOrDefault(c => c.Id == Session.CurrentCustomer.Id);
+        var checkoutCart = db.Carts.Include(c => c.Items).ThenInclude(i => i.Product).FirstOrDefault(c => c.CustomerId == Session.CurrentCustomer.Id);
         
         var rows = new List<string>();
         decimal subtotal = 0; // Pris utan frakt och moms

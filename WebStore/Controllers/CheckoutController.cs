@@ -59,7 +59,7 @@ public class CheckoutController : ControllerBase
         using var db = new WebStoreContext();
 
         var cart = db.Carts.Include(c => c.Items).ThenInclude(i => i.Product)
-            .FirstOrDefault(c => c.Id == Session.CurrentCustomer.Id);
+            .FirstOrDefault(c => c.CustomerId == Session.CurrentCustomer.Id);
 
         if (Session.IsShippingAddressChanged)
         {
