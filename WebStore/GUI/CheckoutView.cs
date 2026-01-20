@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WebStore.Controllers;
 using WebStore.Data;
 using WebStore.Models;
 
@@ -78,5 +79,89 @@ public class CheckoutView
         var completedWindow = new Window("Ordern har skapats", 2, 10, confirmationRows);
         completedWindow.Draw();
         
+    }
+
+    public static CreditCard CreditCardView()
+    {
+        Console.Clear();
+        HeaderView.ShowShopName();
+
+        string last4;
+        DateTime expiration;
+        string type;
+
+        while (true)
+        {
+            Console.Clear();
+            HeaderView.ShowShopName();
+            var rows = new List<string>
+            {   
+                "Kortuppgifter                       ",
+                "Ange sista 4 av kortnumret: ",
+                "Ange utgångsdatum (yyyy-MM): ",
+                "Ange korttyp: "
+            };
+
+            var window = new Window("Lägg till kreditkort", 2, 5, rows);
+            window.Draw();
+        
+            Console.SetCursorPosition(32, 7); 
+            last4 = Console.ReadLine()!;
+            
+            if (last4.Length != 4 || !last4.All(Char.IsDigit)) // Ifall last4 inte enbart är 4 siffror, gör detta
+            {
+                Console.Clear();
+                HeaderView.ShowShopName();
+                var error = new Window("Fel!", 2, 5, new List<string> { "Kortnumret måste exakt vara 4 siffror", "Tryck valfri knapp för att gå vidare..." });
+                error.Draw();
+                Console.ReadKey();
+                continue;
+            }
+
+            Console.SetCursorPosition(33, 8);
+            string expInput = Console.ReadLine()!;
+            
+            // + "-01"(motsvarar dag) lägger till det obligatoriska värdet för DateTime, försöker sedan konvertera strängen till ett DateTime-objekt
+            if (!DateTime.TryParse(expInput + "-01", out expiration)) 
+            {
+                Console.Clear();
+                HeaderView.ShowShopName();
+                var error = new Window("Fel!", 2, 5, new List<string> { "Felaktigt datumformat! Ange yyyy-MM", "Tryck valfri knapp för att gå vidare..." });
+                error.Draw();
+                Console.ReadKey();
+                continue;
+            }
+
+            Console.SetCursorPosition(18, 9); 
+            type = Console.ReadLine()!;
+
+            if (string.IsNullOrWhiteSpace(type))
+            {
+                Console.Clear();
+                HeaderView.ShowShopName();
+                var error = new Window("Fel!", 2, 5, new List<string> { "Korttyp kan inte vara tomt!", "Tryck valfri knapp för att gå vidare..." });
+                error.Draw();
+                Console.ReadKey();
+                continue;
+            }
+
+            break;
+        }
+        
+        Console.Clear();
+        HeaderView.ShowShopName();
+        var confirmWindow = new Window("Kreditkort tillagt!", 2, 5,
+            new List<string> { "Tryck valfri knapp för att gå vidare..." });
+        confirmWindow.Draw();
+        Console.ReadKey();
+        
+        return new CreditCard
+        {
+            CardNumberLast4 = last4,
+            ExpirationDate = expiration,
+            CardType = type,
+            CustomerId = Session.CurrentCustomer.Id
+        };
+
     }
 }

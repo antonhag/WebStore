@@ -37,8 +37,10 @@ public class CheckoutController : ControllerBase
 
     private void ConfirmCheckout(int paymentMethodId)
     {
+        CheckCreditCard(paymentMethodId);
+        
         CheckoutView.ConfirmCheckoutView();
-
+        
         var key = Console.ReadKey(true).Key;
 
         switch (key)
@@ -58,8 +60,8 @@ public class CheckoutController : ControllerBase
     {
         using var db = new WebStoreContext();
         
+        CheckCreditCard(paymentMethodId);
         
-
         var cart = db.Carts.Include(c => c.Items).ThenInclude(i => i.Product)
             .FirstOrDefault(c => c.CustomerId == Session.CurrentCustomer.Id);
 
@@ -107,5 +109,21 @@ public class CheckoutController : ControllerBase
         Console.ReadKey();
         
         new HomeController().Run();
+    }
+
+    public static void CheckCreditCard(int paymentMethodId)
+    {
+        using var db = new WebStoreContext();
+        
+        if (paymentMethodId == 1 && Session.CurrentCustomer.CreditCards.Count == 0)
+        {
+            var newCard = CheckoutView.CreditCardView();
+            
+            db.CreditCards.Add(newCard);
+            db.SaveChanges();
+            
+            Session.CurrentCustomer.CreditCards.Add(newCard);
+
+        }
     }
 }
