@@ -108,7 +108,7 @@ public class ProductListView
         return quantity;
     }
 
-    private static void StockErrorView(Product product, int quantity)
+    public static void StockErrorView(Product product, int quantity)
     {
         var rows = new List<string>();
         

@@ -105,8 +105,7 @@ public class ProductController : ControllerBase
                 TotalPrice = quantity * product.Price
             });
         }
-
-        product.StockQuantity -= quantity;
+        
         db.SaveChanges();
     }
 }

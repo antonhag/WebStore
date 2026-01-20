@@ -90,6 +90,12 @@ public class CheckoutController : ControllerBase
                 TotalPrice = i.TotalPrice
             }).ToList()
         };
+
+        // Minska lagret för varje produkt som kunden köpt
+        foreach (var item in cart.Items)
+        {
+            item.Product.StockQuantity -= item.Quantity;
+        }
         
         db.Orders.Add(order);
         db.Carts.Remove(cart);
