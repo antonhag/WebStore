@@ -57,6 +57,8 @@ public class CheckoutController : ControllerBase
     private void Checkout(int paymentMethodId)
     {
         using var db = new WebStoreContext();
+        
+        
 
         var cart = db.Carts.Include(c => c.Items).ThenInclude(i => i.Product)
             .FirstOrDefault(c => c.CustomerId == Session.CurrentCustomer.Id);

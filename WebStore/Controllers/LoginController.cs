@@ -42,7 +42,7 @@ public class LoginController : ControllerBase
         
         var (email, password) = LoginView.GetCredentials();
 
-        var customer = db.Customers.Include(c=> c.City).ThenInclude(ci => ci.Country).FirstOrDefault(c => c.Email == email && c.Password == password);
+        var customer = db.Customers.Include(c=> c.City).ThenInclude(ci => ci.Country).Include(c => c.CreditCards).FirstOrDefault(c => c.Email == email && c.Password == password);
 
         if (customer != null)
         {
