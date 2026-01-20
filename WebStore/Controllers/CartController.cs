@@ -18,7 +18,12 @@ public class CartController : ControllerBase
     {
         var key = Console.ReadKey(true).Key;
 
-        if (key >= ConsoleKey.D1 && key <= ConsoleKey.D9)
+        if (key == ConsoleKey.D9)
+        {
+            return false;
+        }
+        
+        if (key >= ConsoleKey.D1 && key <= ConsoleKey.D8)
         {
             ChangeQuantity(key);
             return true;
@@ -29,15 +34,13 @@ public class CartController : ControllerBase
             case ConsoleKey.C:
                 new ShippingController().Run();
                 return true;
-            case ConsoleKey.D9:
-                return false;
             default:
                 ShowError("Ogiltigt val!");
                 return true;
         }
     }
 
-    protected static void ChangeQuantity(ConsoleKey key)
+    private static void ChangeQuantity(ConsoleKey key)
     {
         using var db = new WebStoreContext();
         

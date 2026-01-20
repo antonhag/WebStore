@@ -1,44 +1,51 @@
 using WebStore.GUI;
+using WebStore.Models;
 
 namespace WebStore.Controllers;
 
 public class HomeController : ControllerBase
 {
+    private List<(char key, Product product)> selectedDeals = new List<(char, Product)>();
+    
     protected override void DrawView()
     {
         HeaderView.Show();
         CustomerView.Show();
-    }
 
+        selectedDeals = HeaderView.ShowSelectedProducts();
+    }
+    
     protected override bool HandleInput()
     {
-        var key = Console.ReadKey(true).Key;
+        var key = Console.ReadKey(true).KeyChar;
+        char upperKey = char.ToUpper(key);
 
+        if (char.ToUpper(key) == 'A' || char.ToUpper(key) == 'B' || char.ToUpper(key) == 'C')
+        {
+            var selectedDeal = selectedDeals.FirstOrDefault(d => d.key == upperKey);
+            if (selectedDeal.product != null)
+            {
+                var categoryController = new CategoryController();
+                categoryController.BuyProduct(selectedDeal.product.Id);
+                return true;
+            }
+            else
+            {
+                ShowError("Denna deal finns inte längre!");
+                return true;
+            }
+        }
+        
         switch (key)
         {
-            case ConsoleKey.A:
+            case '1':
                 //ToDO
                 return true;
-            case ConsoleKey.B:
-                //ToDO
-                return true;
-            case ConsoleKey.C:
-                //ToDO
-                return true;
-            case ConsoleKey.D1:
-                //ToDO
-                return true;
-            case ConsoleKey.D2:
+            case '2':
                 new CategoryController().Run();
                 return true;
-            case ConsoleKey.D3:
+            case '3':
                 new CartController().Run();
-                return true;
-            case ConsoleKey.D4:
-                //ToDo
-                return true;
-            case ConsoleKey.X:
-                new AdminController().Run();
                 return true;
             default:
                 ShowError("Ogiltigt val!");

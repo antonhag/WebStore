@@ -96,7 +96,7 @@ public class CategoryController : ControllerBase
         }
     }
     
-    private void BuyProduct(int productId)
+    public void BuyProduct(int productId)
     {
         using var db = new WebStoreContext();
 
