@@ -37,7 +37,7 @@ public abstract class ControllerBase
     protected abstract void DrawView();
     protected abstract bool HandleInput();
 
-    protected virtual void ShowError(string message)
+    public virtual void ShowError(string message)
     {
         Console.Clear();
         Console.ForegroundColor = ConsoleColor.Red;

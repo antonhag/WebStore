@@ -1,15 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using WebStore.Data;
 using WebStore.GUI;
+using WebStore.Helpers;
 using WebStore.Models;
 
 namespace WebStore.Controllers;
 
 public class CategoryController : ControllerBase
 {
+    private List<(char key, Product product)> dealsList;
+    
     protected override void DrawView()
     {
-        HeaderView.Show();
+        HeaderView.ShowShopName();
+        dealsList = DealsHelper.ShowDeals(); 
         // Async-metod för att hämta och visa kategorier
         // Eftersom DrawView() är synkron måste vi "brygga" async till sync
         // Detta görs med GetAwaiter().GetResult()
@@ -18,38 +22,36 @@ public class CategoryController : ControllerBase
 
     protected override bool HandleInput()
     {
-        var key = Console.ReadKey(true).Key;
-
-        switch (key)
+        var key = Console.ReadKey(true).KeyChar;
+        char upperKey = char.ToUpper(key);
+        
+        if (upperKey == 'A' || upperKey == 'B' || upperKey == 'C')
         {
-            case ConsoleKey.A:
-                //ToDO
-                return true;
-            case ConsoleKey.B:
-                //ToDO
-                return true;
-            case ConsoleKey.C:
-                //ToDO
-                return true;
-            case ConsoleKey.D1:
+            DealsHelper.HandleDealInput(this, dealsList, upperKey);
+            return true;
+        }
+        
+        switch (upperKey)
+        {
+            case '1':
                 new ProductController(1).Run();
                 return true;
-            case ConsoleKey.D2:
+            case '2':
                 new ProductController(2).Run();
                 return true;
-            case ConsoleKey.D3:
+            case '3':
                 new ProductController(3).Run();
                 return true;
-            case ConsoleKey.D4:
+            case '4':
                 new ProductController(4).Run();
                 return true;
-            case ConsoleKey.S:
+            case 'S':
                 SearchProduct();
                 return true;
-            case ConsoleKey.D9:
+            case '9':
                 return false;
             default:
-                ShowError("Ogiltigt val KATEGORI!");
+                ShowError("Ogiltigt val!");
                 return true;
         }
     }

@@ -20,7 +20,7 @@ public class HomeController : ControllerBase
         var key = Console.ReadKey(true).KeyChar;
         char upperKey = char.ToUpper(key);
 
-        if (char.ToUpper(key) == 'A' || char.ToUpper(key) == 'B' || char.ToUpper(key) == 'C')
+        if (upperKey == 'A' || upperKey == 'B' || upperKey == 'C')
         {
             var selectedDeal = selectedDeals.FirstOrDefault(d => d.key == upperKey);
             if (selectedDeal.product != null)
