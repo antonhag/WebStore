@@ -1,39 +1,28 @@
 using WebStore.GUI;
+using WebStore.Helpers;
 using WebStore.Models;
 
 namespace WebStore.Controllers;
 
 public class HomeController : ControllerBase
 {
-    private List<(char key, Product product)> selectedDeals = new List<(char, Product)>();
+    private List<(char key, Product product)> _dealsList;
     
     protected override void DrawView()
     {
-        HeaderView.Show();
+        _dealsList = HeaderView.ShowWithDeals(); // Ritar upp deals och returnerar listan av tangent med produkt-kopplingar
         CustomerView.Show();
-
-        selectedDeals = HeaderView.ShowSelectedProducts();
     }
     
     protected override bool HandleInput()
     {
         var key = Console.ReadKey(true).KeyChar;
         char upperKey = char.ToUpper(key);
-
+        
         if (upperKey == 'A' || upperKey == 'B' || upperKey == 'C')
         {
-            var selectedDeal = selectedDeals.FirstOrDefault(d => d.key == upperKey);
-            if (selectedDeal.product != null)
-            {
-                var categoryController = new CategoryController();
-                categoryController.BuyProduct(selectedDeal.product.Id);
-                return true;
-            }
-            else
-            {
-                ShowError("Denna deal finns inte längre!");
-                return true;
-            }
+            DealsHelper.HandleDealInput(_dealsList, upperKey); // Hanterar köp av vald deal baserat på tangent
+            return true;
         }
         
         switch (key)
@@ -50,8 +39,6 @@ public class HomeController : ControllerBase
             default:
                 ShowError("Ogiltigt val!");
                 return true;
-            
-            
         }
     }
 }

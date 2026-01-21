@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebStore.Data;
 using WebStore.GUI;
+using WebStore.Helpers;
 using WebStore.Models;
 
 namespace WebStore.Controllers;
@@ -8,7 +9,8 @@ namespace WebStore.Controllers;
 public class ProductController : ControllerBase
 {
     private readonly int _categoryId; // Readonly = att den endast kan sättas i konstruktorn och ändras ej
-
+    private List<(char key, Product product)> _dealsList;
+    
     public ProductController(int categoryId)
     {
         _categoryId = categoryId;
@@ -16,7 +18,7 @@ public class ProductController : ControllerBase
 
     protected override void DrawView()
     {
-        HeaderView.Show();
+        _dealsList = HeaderView.ShowWithDeals();
         ProductListView.Show(_categoryId);
     }
 
@@ -25,34 +27,36 @@ public class ProductController : ControllerBase
         using var db = new WebStoreContext();
         var products = db.Products.Where(p => p.CategoryId == _categoryId).OrderBy(p => p.Id).ToList();
 
-        var key = Console.ReadKey(true).Key;
-        int selectedIndex = (int)key - (int)ConsoleKey.D0; // D1 numeriska värde = 49. D1(49) - D0(48) = 1. D2(50) - D0(48) = 2 osv...
-
-        if (selectedIndex > 0 && selectedIndex <= products.Count)
+        var key = Console.ReadKey(true).KeyChar;
+        char upperKey = char.ToUpper(key);
+        
+        if (upperKey == 'A' || upperKey == 'B' || upperKey == 'C')
         {
-            int productId = products[selectedIndex - 1].Id;
-            ProductListView.ShowDetails(productId);
-            var key2 = Console.ReadKey(true).Key;
-
-            if (key2 == ConsoleKey.B)
-            {
-                BuyProduct(productId);
-            }
+            DealsHelper.HandleDealInput(_dealsList, upperKey);
             return true;
         }
 
-        switch (key)
+        if (char.IsDigit(upperKey))
         {
-            case ConsoleKey.A:
-                //ToDO
+            int index = upperKey - '0';
+
+            if (index >= 1 && index <= products.Count)
+            {
+                int productId = products[index - 1].Id;
+                
+                ProductListView.ShowDetails(productId);
+                var key2 = char.ToUpper(Console.ReadKey(true).KeyChar);
+                if (key2 == 'B')
+                {
+                    BuyProduct(productId);
+                }
                 return true;
-            case ConsoleKey.B:
-                //ToDO
-                return true;
-            case ConsoleKey.C:
-                //ToDO
-                return true;
-            case ConsoleKey.D9:
+            }
+        }
+
+        switch (upperKey)
+        {
+            case '9':
                 return false;
             default:
                 ShowError("Ogiltigt val!");

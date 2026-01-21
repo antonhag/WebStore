@@ -44,7 +44,7 @@ public class CategoryView
     public static void ShowSearchResults(List<Product> products)
     {
         Console.Clear();
-        HeaderView.Show();
+        HeaderView.ShowWithDeals();
         
         var rows = new List<string>();
         int index = 1;
@@ -63,7 +63,7 @@ public class CategoryView
     public static void SearchError(string message)
     {
         Console.Clear();
-        HeaderView.Show();
+        HeaderView.ShowWithDeals();
         
         var errorWindow = new Window ("Fel", 2, 10, new List<string> { message, "Tryck valfri knapp för att gå tillbaka" });
         errorWindow.Draw();

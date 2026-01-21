@@ -8,7 +8,7 @@ public class ProductListView
     public static void Show(int categoryId)
     {
         Console.Clear();
-        HeaderView.Show();
+        HeaderView.ShowWithDeals();
         var productList = new List<string>();
 
         using (var db = new WebStoreContext())
@@ -33,7 +33,7 @@ public class ProductListView
     public static void ShowDetails(int productId)
     {
         Console.Clear();
-        HeaderView.Show();
+        HeaderView.ShowWithDeals();
         using var db = new WebStoreContext();
         var product = db.Products.FirstOrDefault(p => p.Id == productId);
 
@@ -75,7 +75,7 @@ public class ProductListView
         while (true)
         {
             Console.Clear();
-            HeaderView.Show();
+            HeaderView.ShowWithDeals();
             ShowDetails(product.Id);
             var buyWindow = new Window($"Antal av: {product.Name}", 2, 18, new List<string> { "Ange antal: ", "[0] För att avbryta" });
             buyWindow.Draw();
@@ -137,7 +137,7 @@ public class ProductListView
     private static void ShowConfirmation(Product product, int quantity)
     {
         Console.Clear();
-        HeaderView.Show();
+        HeaderView.ShowWithDeals();
         
         var confirmationWindow = new Window("Tillagd i varukorgen", 2, 10,
             new List<string>

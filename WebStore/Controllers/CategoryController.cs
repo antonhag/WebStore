@@ -8,12 +8,11 @@ namespace WebStore.Controllers;
 
 public class CategoryController : ControllerBase
 {
-    private List<(char key, Product product)> dealsList;
+    private List<(char key, Product product)> _dealsList;
     
     protected override void DrawView()
     {
-        HeaderView.ShowShopName();
-        dealsList = DealsHelper.ShowDeals(); 
+        _dealsList = HeaderView.ShowWithDeals();
         // Async-metod för att hämta och visa kategorier
         // Eftersom DrawView() är synkron måste vi "brygga" async till sync
         // Detta görs med GetAwaiter().GetResult()
@@ -27,7 +26,7 @@ public class CategoryController : ControllerBase
         
         if (upperKey == 'A' || upperKey == 'B' || upperKey == 'C')
         {
-            DealsHelper.HandleDealInput(this, dealsList, upperKey);
+            DealsHelper.HandleDealInput(_dealsList, upperKey);
             return true;
         }
         

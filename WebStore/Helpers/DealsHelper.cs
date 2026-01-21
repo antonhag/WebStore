@@ -7,7 +7,8 @@ namespace WebStore.Helpers;
 
 public static class DealsHelper
 {
-    public static List<(char key, Product product)> ShowDeals()
+    public static List<(char key, Product product)>
+        ShowDeals() // Ritar upp deals och returnerar en lista av produkter med koppling till A, B, C
     {
         List<(char key, Product product)> dealsList = new List<(char, Product)>();
 
@@ -22,7 +23,7 @@ public static class DealsHelper
             foreach (var deal in deals)
             {
                 var dealWindow = new Window(
-                    "Erbjudande " + (buttonKey - 'A' + 1),
+                    "Erbjudande " + (buttonKey - 'A' + 1), // Räknar om bokstav till nummer
                     left,
                     top,
                     new List<string>
@@ -35,35 +36,29 @@ public static class DealsHelper
 
                 dealWindow.Draw();
 
-                dealsList.Add((buttonKey, deal));
+                dealsList.Add((buttonKey, deal)); // Här sker kopplingen mellan en produkt och tex 'A'
 
                 left += 26;
                 buttonKey++;
             }
         }
+
         return dealsList;
     }
 
-    public static void HandleDealInput(ControllerBase controller, List<(char key, Product product)> dealsList, char keyPressed)
+    public static void HandleDealInput(List<(char key, Product product)> dealsList,
+        char keyPressed) // Metod för att hantera köp av den dealen som är vald
     {
-        while (true)
-        {
-            var upperKey = char.ToUpper(keyPressed);
+        var upperKey = char.ToUpper(keyPressed);
 
-            if (upperKey == 'A' || upperKey == 'B' || upperKey == 'C')
-            {
-                var selectedDeal = dealsList.FirstOrDefault(d => d.key == upperKey);
-                if (selectedDeal.product != null)
-                {
-                    var categoryController = new CategoryController();
-                    categoryController.BuyProduct(selectedDeal.product.Id);
-                    return;
-                }
-                else
-                {
-                    controller.ShowError("Ogiltigt val! Försök igen");
-                }
-            }
-        }
+       var selectedDeal = dealsList.FirstOrDefault(p => p.key == upperKey);
+
+       if (selectedDeal.product == null)
+       {
+           return; // Extra säkerhet, bör ej inträffa
+       }
+       
+       var categoryController = new CategoryController();
+       categoryController.BuyProduct(selectedDeal.product.Id);
     }
 }

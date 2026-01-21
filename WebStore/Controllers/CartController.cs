@@ -10,7 +10,7 @@ public class CartController : ControllerBase
 {
     protected override void DrawView()
     {
-        HeaderView.Show();
+        HeaderView.ShowShopName();
         CartView.Show();
     }
 
