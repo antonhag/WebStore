@@ -91,6 +91,12 @@ public class AdminController : ControllerBase
             return;
         }
 
+        if (input?.ToUpper() == "A")
+        {
+            AddProduct();
+            return;
+        }
+
         if (!int.TryParse(input, out int productId))
         {
             ShowError("Ogiltigt ID! Ange endast siffror!");
@@ -188,5 +194,31 @@ public class AdminController : ControllerBase
                 Console.WriteLine("Ogiltigt val!");
             }
         }
+    }
+
+    private static void AddProduct()
+    {
+        var productInfo = AdminView.AddProductView();
+
+        Product newProduct = new Product
+        {
+            Name = productInfo.productName,
+            Description = productInfo.description,
+            Price = productInfo.price,
+            CategoryId = productInfo.productCategory,
+            Supplier = productInfo.supplier,
+            StockQuantity = productInfo.stockQuantity
+        };
+        
+        using var db = new WebStoreContext();
+        
+        var categoryExists = db.Categories.Any(c => c.Id == newProduct.CategoryId);
+        
+        db.Products.Add(newProduct);
+        db.SaveChanges();
+
+        Console.WriteLine($"Produkt {newProduct.Name} har lagts till!");
+        Console.WriteLine("Tryck valfri tangent för att fortsätta...");
+        Console.ReadKey(true);
     }
 }

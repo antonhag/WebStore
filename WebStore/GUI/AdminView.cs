@@ -44,6 +44,7 @@ public class AdminView
         {
             "Ange Produkt-ID: ",
             "X = Utvald produkt",
+            "A. För att lägga till produkt",
             "B. Gå tillbaka till menyn"
         };
 
@@ -163,5 +164,79 @@ public class AdminView
         char upperKey = char.ToUpper(key);
         
         return upperKey;
+    }
+
+    public static (string productName, string description, decimal price, int productCategory, string supplier, int
+        stockQuantity) AddProductView()
+    {
+        using var db = new WebStoreContext();
+        
+        Console.Clear();
+        Console.WriteLine("--------- Lägg till ny produkt ---------\n");
+
+        Console.Write("Produktnamn: ");
+        var name = Console.ReadLine()!;
+        while (string.IsNullOrWhiteSpace(name))
+        {
+            Console.Clear();
+            Console.Write("Produktnamn får inte vara tomt försök igen: ");
+            name = Console.ReadLine();
+        }
+
+        Console.Write("Beskrivning: ");
+        var desc = Console.ReadLine() ?? ""; // Om användaren inte skriver något (null), sätt desc till tom sträng
+        
+        decimal price;
+        while (true)
+        {
+            Console.Write("Pris: ");
+            if (decimal.TryParse(Console.ReadLine(), out price) && price > 0) // Break ifall det stämmer, annars skriv felmeddelande
+                break;
+            Console.WriteLine("Fel: Ange ett giltigt pris större än 0.");
+        }
+
+        Console.Clear();
+        
+        var categories = db.Categories.ToList();
+        Console.WriteLine("Tillgängliga kategorier:");
+        foreach (var c in categories)
+        {
+            Console.WriteLine($"{c.Id}: {c.Name}");
+        }
+        
+        Console.Write("\nKategori-Id: ");
+        int categoryId;
+        while (true)
+        {
+            Console.Write("Välj kategori-id: ");
+            if (!int.TryParse(Console.ReadLine(), out categoryId))
+            {
+                Console.WriteLine("Fel: Ange en siffra.");
+                continue;
+            }
+
+            if (!db.Categories.Any(c => c.Id == categoryId))
+            {
+                Console.WriteLine($"Fel: Kategori med ID {categoryId} finns inte. Försök igen.");
+                continue;
+            }
+
+            break; // giltigt kategori-id
+        }
+
+        Console.Write("Leverantör: ");
+        var supplier = Console.ReadLine();
+
+        Console.Write("Lagerantal: ");
+        int stock;
+        while (true)
+        {
+            Console.Write("Lagerantal: ");
+            if (int.TryParse(Console.ReadLine(), out stock) && stock >= 0)
+                break;
+            Console.WriteLine("Fel: Lagerantal måste vara 0 eller högre.");
+        }
+        
+        return (name, desc, price, categoryId, supplier, stock);
     }
 }
