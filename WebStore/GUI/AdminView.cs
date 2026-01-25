@@ -22,6 +22,14 @@ public class AdminView
         Återgå_till_menyn = 9
     }
 
+    public enum ManageCategoriesMenu
+    {
+        Lägga_till_produktkategori = 1,
+        Ta_bort_produktkategori,
+        Ändra_produktkategori,
+        Återgå_till_menyn = 9
+    }
+
     public static void Show()
     {
         var adminOptions = new List<string>();
@@ -178,7 +186,6 @@ public class AdminView
         var name = Console.ReadLine()!;
         while (string.IsNullOrWhiteSpace(name))
         {
-            Console.Clear();
             Console.Write("Produktnamn får inte vara tomt försök igen: ");
             name = Console.ReadLine();
         }
@@ -238,5 +245,122 @@ public class AdminView
         }
         
         return (name, desc, price, categoryId, supplier, stock);
+    }
+    
+    public static void ManageCategoriesView()
+    {
+        Console.Clear();
+        
+        var categoryOptions = new List<string>();
+
+        foreach (int i in Enum.GetValues(typeof(ManageCategoriesMenu)))
+        {
+            categoryOptions.Add($"{i}. {Enum.GetName(typeof(ManageCategoriesMenu), i).Replace("_", " ")}");
+        }
+        
+
+        var categoryOption = new Window("Välj alternativ", 2, 2, categoryOptions);
+        
+        categoryOption.Draw();
+    }
+
+    public static string AddCategoryView()
+    {
+        Console.Clear();
+        Console.WriteLine("--------- Lägga till produktkategori ---------\n");
+
+        Console.Write("Kategorinamn: ");
+        var name = Console.ReadLine();
+        while (string.IsNullOrWhiteSpace(name))
+        {
+            Console.Clear();
+            Console.Write("Kategorinamn får inte vara tomt försök igen: ");
+            name = Console.ReadLine();
+        }
+        
+        return name;
+    }
+
+    public static int DeleteCategoryView()
+    {
+        Console.Clear();
+        Console.WriteLine("--------- Ta bort produktkategori ---------\n");
+        
+        using var db = new WebStoreContext();
+        
+        var categories = db.Categories.ToList();
+
+        foreach (var c in categories)
+        {
+            Console.WriteLine($"{c.Id}: {c.Name}");
+        }
+
+        int categoryId;
+        while (true)
+        {
+            Console.Write("Välj kategori-id du vill radera: ");
+            if (!int.TryParse(Console.ReadLine(), out categoryId))
+            {
+                Console.WriteLine("Fel: Ange en siffra.");
+                continue;
+            }
+
+            if (!db.Categories.Any(c => c.Id == categoryId))
+            {
+                Console.WriteLine($"Fel: Kategori med ID {categoryId} finns inte. Försök igen.");
+                continue;
+            }
+
+            break; // giltigt kategori-id
+        }
+        
+        return categoryId;
+    }
+
+    public static (int categoryId, string newName) ChangeCategoryView()
+    {
+        Console.Clear();
+        Console.WriteLine("--------- Ändra produktkategori ---------\n");
+        
+        using var db = new WebStoreContext();
+        
+        var categories = db.Categories.ToList();
+
+        foreach (var c in categories)
+        {
+            Console.WriteLine($"{c.Id}: {c.Name}");
+        }
+
+        int categoryId;
+        while (true)
+        {
+            Console.Write("Välj kategori-id du vill ändra: ");
+            if (!int.TryParse(Console.ReadLine(), out categoryId))
+            {
+                Console.WriteLine("Fel: Ange en siffra.");
+                continue;
+            }
+
+            if (!db.Categories.Any(c => c.Id == categoryId))
+            {
+                Console.WriteLine($"Fel: Kategori med ID {categoryId} finns inte. Försök igen.");
+                continue;
+            }
+
+            break; // giltigt kategori-id
+        }
+        var categoryToChange = db.Categories.FirstOrDefault(c => c.Id == categoryId); // för att kunna se tidigare kategorinamn
+        
+        Console.Clear();
+        Console.WriteLine($"Tidigare kategorinamn:  {categoryToChange.Name}");
+        Console.Write("Ange nytt kategorinamn: ");
+        var newName = Console.ReadLine();
+        while (string.IsNullOrWhiteSpace(newName))
+        {
+            Console.Write("Kategorinamn får inte vara tomt försök igen: ");
+            newName = Console.ReadLine();
+        }
+        
+        return (categoryId, newName);
     }
 }

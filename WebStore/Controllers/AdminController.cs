@@ -21,6 +21,7 @@ public class AdminController : ControllerBase
                 ManageProducts();
                 return true;
             case '2':
+                ManageCategories();
                 return true;
             case '3':
                 return true;
@@ -218,6 +219,89 @@ public class AdminController : ControllerBase
         db.SaveChanges();
 
         Console.WriteLine($"Produkt {newProduct.Name} har lagts till!");
+        Console.WriteLine("Tryck valfri tangent för att fortsätta...");
+        Console.ReadKey(true);
+    }
+
+    private void ManageCategories()
+    {
+        AdminView.ManageCategoriesView();
+        
+        var key = Console.ReadKey(true).KeyChar;
+
+        switch (key)
+        {
+            case '1':
+                AddCategory();
+                break;
+            case '2':
+                DeleteCategory();
+                break;
+            case '3':
+                ChangeCategory();
+                break;
+            case '9':
+                break;
+            default:
+                ShowError("Ogiltigt val!");
+                break;
+        }
+    }
+
+    private static void AddCategory()
+    {
+        var categoryName = AdminView.AddCategoryView();
+        
+        using var db = new WebStoreContext();
+
+        Category newCategory = new Category
+        {
+            Name = categoryName
+        };
+        
+        db.Categories.Add(newCategory);
+        db.SaveChanges();
+
+        Console.Clear();
+        Console.WriteLine($"Kategorin {newCategory.Name} har lagts till!");
+        Console.WriteLine("Tryck valfri tangent för att fortsätta...");
+        Console.ReadKey(true);    }
+
+    private static void DeleteCategory()
+    {
+        var chosenId = AdminView.DeleteCategoryView();
+        
+        using var db = new WebStoreContext();
+        
+        var categoryToDelete = db.Categories.FirstOrDefault(c => c.Id == chosenId);
+        
+        db.Categories.Remove(categoryToDelete);
+        db.SaveChanges();
+        
+        Console.Clear();
+        Console.WriteLine($"Kategorin {categoryToDelete.Name} har tagits bort!");
+        Console.WriteLine("Tryck valfri tangent för att fortsätta...");
+        Console.ReadKey(true);
+    }
+    
+    private void ChangeCategory()
+    {
+        var (categoryId, newName) = AdminView.ChangeCategoryView();
+        
+        using var db = new WebStoreContext();
+        var category = db.Categories.FirstOrDefault(c => c.Id == categoryId);
+        
+        if (category == null)
+        {
+            Console.WriteLine("Kategorin hittades inte.");
+            return;
+        }
+        
+        category.Name = newName;
+        db.SaveChanges();
+        
+        Console.Clear();
+        Console.WriteLine($"Kategorin har uppdaterats!");
         Console.WriteLine("Tryck valfri tangent för att fortsätta...");
         Console.ReadKey(true);
     }
