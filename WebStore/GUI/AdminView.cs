@@ -15,18 +15,25 @@ public class AdminView
         Återgå_till_startsida = 9
     }
     
-    public enum ManageProductsMenu
+    private enum ManageProductsMenu
     {
         Ändra_produkt = 1,
         Ta_bort_produkt,
         Återgå_till_menyn = 9
     }
 
-    public enum ManageCategoriesMenu
+    private enum ManageCategoriesMenu
     {
         Lägga_till_produktkategori = 1,
         Ta_bort_produktkategori,
         Ändra_produktkategori,
+        Återgå_till_menyn = 9
+    }
+
+    private enum ManageCustomerMenu
+    {
+        Ändra_kunds_uppgifter = 1,
+        Se_kunds_beställningshistorik,
         Återgå_till_menyn = 9
     }
 
@@ -107,6 +114,7 @@ public class AdminView
     public static (string? productName,string? description, decimal? price, int? productCategory, string? supplier, int? stockQuantity) ChangeProductView(Product product)
     {
         Console.Clear();
+        Console.WriteLine("--------- Ändra produkt ---------\n");
         Console.WriteLine("Lämna fältet tomt för oförändrat\n");
         
         Console.WriteLine($"Tidigare produktnamn: {product.Name}");
@@ -128,7 +136,7 @@ public class AdminView
         }
         
         Console.WriteLine($"Tidigare kategori-id: {product.CategoryId}");
-        Console.Write("Ange ny kategori-id (lämna tom för oförändrat): ");
+        Console.Write("Ange ny kategori-Id: ");
         var categoryInput = Console.ReadLine();
 
         int? newCategory = null;
@@ -362,5 +370,65 @@ public class AdminView
         }
         
         return (categoryId, newName);
+    }
+
+    public static void ManageCustomerView()
+    {
+        Console.Clear();
+        
+        var customerOptions = new List<string>();
+
+        foreach (int i in Enum.GetValues(typeof(ManageCustomerMenu)))
+        {
+            customerOptions.Add($"{i}. {Enum.GetName(typeof(ManageCustomerMenu), i).Replace("_", " ")}");
+        }
+        
+        var window = new Window("Admin || Välj alternativ", 2, 2, customerOptions);
+        
+        window.Draw();
+    }
+
+    public static void AllCustomers()
+    {
+        Console.Clear();
+        Console.WriteLine("--------- Alla kunder ---------\n");
+        
+        using var db = new WebStoreContext();
+        var customers = db.Customers.ToList();
+
+        foreach (var c in customers)
+        {
+            Console.WriteLine($"{c.Id}. {c.FirstName} {c.LastName}");
+        }
+
+        Console.WriteLine("-------------------------------");
+        
+        Console.WriteLine("\nB = Återgå till menyn");
+        Console.Write("Ange kund-id för den du vill välja: ");
+    }
+    
+    public static (string? newEmail, string? newPhoneNumber, string? newPassword, string? newStreet) ChangeCustomerView(Customer customer) // Tar in customer objekt för att kunna se tidigare mail, nummer osv
+    {
+        Console.Clear();
+        Console.WriteLine("--------- Ändra kunduppgifter ---------\n");
+        Console.WriteLine("Lämna fältet tomt för oförändrat\n");
+
+        Console.WriteLine($"Tidigare email: {customer.Email}");
+        Console.Write("Ange ny email: ");
+        var newEmail = Console.ReadLine();
+        
+        Console.WriteLine($"Tidigare telefonnummer: {customer.PhoneNumber}");
+        Console.Write("Ange nytt telefonnummer: ");
+        var newPhoneNumber = Console.ReadLine();
+        
+        Console.WriteLine($"Tidigare lösenord: {customer.Password}");
+        Console.Write("Ange nytt lösenord: ");
+        var newPassword = Console.ReadLine();
+
+        Console.WriteLine($"Tidigare adress: {customer.Street}");
+        Console.Write("Ange ny gatuadress: ");
+        var newStreet = Console.ReadLine();
+
+        return (newEmail, newPhoneNumber, newPassword, newStreet);
     }
 }

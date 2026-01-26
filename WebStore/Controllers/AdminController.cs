@@ -24,6 +24,7 @@ public class AdminController : ControllerBase
                 ManageCategories();
                 return true;
             case '3':
+                ManageCustomer();
                 return true;
             case '4':
                 ManageSelectedProducts();
@@ -140,7 +141,7 @@ public class AdminController : ControllerBase
     {
         var result = AdminView.ChangeProductView(product);
         
-        // 2. Uppdatera endast om användaren angav något
+        // Uppdatera endast om användaren angav något
         if (!string.IsNullOrWhiteSpace(result.productName))
             product.Name = result.productName;
 
@@ -302,6 +303,86 @@ public class AdminController : ControllerBase
         
         Console.Clear();
         Console.WriteLine($"Kategorin har uppdaterats!");
+        Console.WriteLine("Tryck valfri tangent för att fortsätta...");
+        Console.ReadKey(true);
+    }
+    
+    private void ManageCustomer()
+    {
+        Console.Clear();
+        AdminView.AllCustomers();
+        
+        var input = Console.ReadLine();
+        
+        if (input?.ToUpper() == "B") // För att gå tillbaka till menyn
+        {
+            return;
+        }
+
+        if (!int.TryParse(input, out int customerId))
+        {
+            ShowError("Ogiltigt ID! Ange endast siffror!");
+            return;
+        }
+        
+        using var db = new WebStoreContext();
+        
+        var customer =  db.Customers.FirstOrDefault(c => c.Id == customerId);
+        
+        if (customer == null)
+        {
+            ShowError("Kunden hittades inte!");
+            return;
+        }
+        
+        Console.Clear();
+        AdminView.ManageCustomerView();
+        
+
+        var optionInput = Console.ReadKey(true).KeyChar;
+        
+        switch (optionInput)
+        {
+            case '1':
+                ChangeCustomer(customer);
+                break;
+            case '2':
+                
+                break;
+            case '3':
+                
+                break;
+            case '9':
+                break;
+            default:
+                ShowError("Ogiltigt val!");
+                break;
+        }
+    }
+
+    private void ChangeCustomer(Customer customer)
+    {
+        var newCustomerInfo = AdminView.ChangeCustomerView(customer);
+        
+        //  Uppdatera endast om användaren angav något
+        if (!string.IsNullOrWhiteSpace(newCustomerInfo.newEmail))
+            customer.Email = newCustomerInfo.newEmail;
+
+        if (!string.IsNullOrWhiteSpace(newCustomerInfo.newPhoneNumber))
+            customer.PhoneNumber = newCustomerInfo.newPhoneNumber;
+
+        if (!string.IsNullOrWhiteSpace(newCustomerInfo.newPassword))
+            customer.Password = newCustomerInfo.newPassword;
+
+        if (!string.IsNullOrWhiteSpace(newCustomerInfo.newStreet))
+            customer.Street = newCustomerInfo.newStreet;
+        
+        using var db = new WebStoreContext();
+        db.Customers.Update(customer);
+        db.SaveChanges();
+        
+        Console.Clear();
+        Console.WriteLine($"Kunduppgifterna har uppdaterats!");
         Console.WriteLine("Tryck valfri tangent för att fortsätta...");
         Console.ReadKey(true);
     }

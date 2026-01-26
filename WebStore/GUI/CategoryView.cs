@@ -15,7 +15,7 @@ public class CategoryView
 
         using (var connection = new SqlConnection(connectionString))
         {
-            var sql = "SELECT Id, Name FROM webstore.Categories";
+            var sql = "SELECT Id, Name FROM webstore.Categories"; // Dapper
             
             var categories = await connection.QueryAsync<Category>(sql);
 
