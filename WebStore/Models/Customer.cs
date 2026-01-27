@@ -13,7 +13,9 @@ public class Customer
     
     public int? CityId { get; set; }
     public virtual City? City { get; set; }
+    
     public virtual List<CreditCard> CreditCards { get; set; } = new List<CreditCard>();
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
 
 

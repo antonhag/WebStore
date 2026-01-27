@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WebStore.Data;
 using WebStore.GUI;
 using WebStore.Models;
@@ -347,7 +348,7 @@ public class AdminController : ControllerBase
                 ChangeCustomer(customer);
                 break;
             case '2':
-                
+                CustomerOrderHistory(customerId);
                 break;
             case '3':
                 
@@ -385,5 +386,22 @@ public class AdminController : ControllerBase
         Console.WriteLine($"Kunduppgifterna har uppdaterats!");
         Console.WriteLine("Tryck valfri tangent för att fortsätta...");
         Console.ReadKey(true);
+    }
+
+    private void CustomerOrderHistory(int customerId)
+    {
+        var orderHistory = new List<string>();
+        
+        using var db = new WebStoreContext();
+        
+        var customer = db.Customers.Include(c => c.Orders).ThenInclude(o => o.OrderItems).ThenInclude(oi => oi.Product).FirstOrDefault(c => c.Id == customerId);
+
+        if (customer == null)
+        {
+            ShowError("Kunden hittades inte!");
+            return;
+        }
+        
+        AdminView.CustomerOrderHistoryView(customer);
     }
 }

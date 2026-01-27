@@ -431,4 +431,37 @@ public class AdminView
 
         return (newEmail, newPhoneNumber, newPassword, newStreet);
     }
+    
+    public static void CustomerOrderHistoryView(Customer customer)
+    {
+        Console.Clear();
+        Console.WriteLine("--------- Orderhistorik ---------\n");
+        Console.WriteLine($"Kund: {customer.FirstName} {customer.LastName}\n");
+
+        if (!customer.Orders.Any())
+        {
+            Console.WriteLine("Kunden har inga ordrar.");
+            Console.WriteLine("Tryck valfri knapp för att gå vidare...");
+            Console.ReadKey(true);
+        }
+
+        foreach (var order in customer.Orders.OrderBy(o => o.OrderDate))
+        {
+            Console.WriteLine($"Order #{order.Id}");
+            Console.WriteLine($"Datum: {order.OrderDate}");
+            Console.WriteLine($"Status: {order.Status}");
+            Console.WriteLine($"Totalt: {order.TotalAmount} kr");
+            Console.WriteLine("Produkter: ");
+
+            foreach (var item in order.OrderItems)
+            {
+                Console.WriteLine($"  - {item.Product.Name} x{item.Quantity} | {item.Product.Price} kr");
+            }
+            
+            Console.WriteLine(new string('-', 40)); // Snyggt radbryt
+        }
+        
+        Console.WriteLine("\nTryck valfri tangent för att gå tillbaka...");
+        Console.ReadKey(true);
+    }
 }
