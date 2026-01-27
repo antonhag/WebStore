@@ -76,6 +76,13 @@ public class CheckoutController : ControllerBase
             return;
         }
         
+        // Räknar ut totala priset med moms plus frakt
+        decimal subtotal = cart.Items.Sum(i => i.TotalPrice);
+        decimal shipping = Session.SelectedDeliveryOption?.Cost ?? 0; // Fraktkostnad, om ingen metod är vald sätts kostnaden till 0 (vilket inte kan ske)
+        decimal taxRate = 0.25m; // 25% moms
+        decimal taxAmount = subtotal * taxRate;
+        decimal total = subtotal + taxAmount + shipping;
+        
         var order = new Order
         {
             CustomerId = Session.CurrentCustomer.Id,
@@ -86,7 +93,7 @@ public class CheckoutController : ControllerBase
                 : Session.CurrentCustomer.Street,
             DeliveryCityId = Session.CurrentCustomer.CityId.Value,
             OrderDate = DateTime.Now,
-            TotalAmount = cart.Items.Sum(i => i.TotalPrice),
+            TotalAmount = total,
             OrderItems = cart.Items.Select(i => new OrderItem
             {
                 ProductId = i.ProductId,

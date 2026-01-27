@@ -219,7 +219,6 @@ public class AdminView
             Console.WriteLine($"{c.Id}: {c.Name}");
         }
         
-        Console.Write("\nKategori-Id: ");
         int categoryId;
         while (true)
         {
@@ -241,8 +240,7 @@ public class AdminView
 
         Console.Write("Leverantör: ");
         var supplier = Console.ReadLine();
-
-        Console.Write("Lagerantal: ");
+        
         int stock;
         while (true)
         {
@@ -438,14 +436,14 @@ public class AdminView
         Console.WriteLine("--------- Orderhistorik ---------\n");
         Console.WriteLine($"Kund: {customer.FirstName} {customer.LastName}\n");
 
-        if (!customer.Orders.Any())
+        if (!customer.Orders.Any()) // ifall kunden inte har några ordrar, gör detta.
         {
             Console.WriteLine("Kunden har inga ordrar.");
             Console.WriteLine("Tryck valfri knapp för att gå vidare...");
             Console.ReadKey(true);
         }
 
-        foreach (var order in customer.Orders.OrderBy(o => o.OrderDate))
+        foreach (var order in customer.Orders.OrderByDescending(o => o.OrderDate))
         {
             Console.WriteLine($"Order #{order.Id}");
             Console.WriteLine($"Datum: {order.OrderDate}");

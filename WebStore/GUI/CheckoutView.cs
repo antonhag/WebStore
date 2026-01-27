@@ -33,7 +33,7 @@ public class CheckoutView
         rows.Add($"Frakt: {shipping} kr");
         rows.Add($"Moms (25%): {taxAmount:F2} kr"); // F2 för att få två decimaler
         rows.Add("------------------------------------------");
-        rows.Add($"Totalt: {total} kr");
+        rows.Add($"Totalt: {total:F2} kr");
         
         var productsWindow = new Window("Varukorg", 2, 4, rows);
         productsWindow.Draw();
@@ -70,7 +70,7 @@ public class CheckoutView
         {
             $"Tack för din beställning, {Session.CurrentCustomer.FirstName}!",
             $"Ordernummer: {order.Id}",
-            $"Totalt belopp: {order.TotalAmount} kr",
+            $"Totalt belopp: {order.TotalAmount:F2} kr",
             $"Leveransadress: {order.DeliveryStreet}",
             "Du har fått ett mejl med orderbekräftelse.",
             "Tryck valfri knapp för att fortsätta..."

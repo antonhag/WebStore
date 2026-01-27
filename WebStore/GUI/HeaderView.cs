@@ -8,7 +8,12 @@ public class HeaderView
 {
     public static void ShowShopName()
     {
-        var header = new Window($"Hags Kläder", 2, 1, new List<string> { "Trender som håller, pris som inte slår hål!" });
+        // Ifall ingen är inloggad (första sidan) skriv ut butiksnamn endast, annars välkommen meddelande när man är inloggad
+        string shopHeader = Session.CurrentCustomer != null
+            ? $"Välkommen till Hags Kläder {Session.CurrentCustomer.FirstName}"
+            : "Hags Kläder";
+
+        var header = new Window(shopHeader, 2, 1, new List<string> { "Trender som håller, pris som inte slår hål!" });
         header.Draw();
     }
     
