@@ -439,8 +439,6 @@ public class AdminView
         if (!customer.Orders.Any()) // ifall kunden inte har några ordrar, gör detta.
         {
             Console.WriteLine("Kunden har inga ordrar.");
-            Console.WriteLine("Tryck valfri knapp för att gå vidare...");
-            Console.ReadKey(true);
         }
 
         foreach (var order in customer.Orders.OrderByDescending(o => o.OrderDate))

@@ -31,6 +31,7 @@ public class AdminController : ControllerBase
                 ManageSelectedProducts();
                 return true;
             case '5':
+                new StatsController().Run();
                 return true;
             case '9':
                 return false;
