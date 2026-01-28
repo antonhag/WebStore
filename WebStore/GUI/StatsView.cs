@@ -1,3 +1,5 @@
+using WebStore.Helpers;
+
 namespace WebStore.GUI;
 
 public class StatsView
@@ -10,6 +12,7 @@ public class StatsView
         Antal_kunder_per_stad,
         Topp_5_mest_sålda_produkter,
         Försäljning_per_leverantör,
+        Se_senaste_sökta_produkter,
         Återgå_till_menyn = 9
     }
 
@@ -154,6 +157,34 @@ public class StatsView
             Console.WriteLine($"{supplier.Key,-30} {supplier.Value} st sålda");
         }
         
+        
+        Console.WriteLine("\nTryck valfri knapp för att fortsätta...");
+        Console.ReadKey(true);
+    }
+
+    public static async Task ShowSearchHistoryView()
+    {
+        Console.Clear();
+        Console.WriteLine("Produkt Sökhistorik:\n");
+        
+        var searchHistory = await MongoLogger.GetSearchHistoryAsync();
+
+        if (searchHistory.Count == 0)
+        {
+            Console.WriteLine("Inga sökningar hittades.");
+            Console.WriteLine("\nTryck valfri knapp för att fortsätta...");
+            Console.ReadKey(true);
+            return;
+        }
+
+        int index = 1;
+        foreach (var log in searchHistory.OrderByDescending(l => l.SearchedAt)) // Senaste sökningar först
+        {
+            string time = log.SearchedAt.ToString("yyyy-MM-dd HH:mm"); // schysstare tidformat
+            string customer = log.Customer?.Name;
+            Console.WriteLine($"{index}. [{time}] \"{log.TextSearched}\" av {customer} (ID: {log.Customer?.CustomerId})");
+            index++;
+        }
         
         Console.WriteLine("\nTryck valfri knapp för att fortsätta...");
         Console.ReadKey(true);

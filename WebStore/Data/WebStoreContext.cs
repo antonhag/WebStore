@@ -20,7 +20,9 @@ public class WebStoreContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer("Server=localhost,14330;Database=WebStoreDb;User Id=sa;Password=StrongP@ssw0rd!;TrustServerCertificate=True;");
+        // optionsBuilder.UseSqlServer("Server=localhost,14330;Database=WebStoreDb;User Id=sa;Password=StrongP@ssw0rd!;TrustServerCertificate=True;");
+        
+        optionsBuilder.UseSqlServer("Server=tcp:webstoredb.database.windows.net,1433;Initial Catalog=WebStoreDb;Persist Security Info=False;User ID=dbadmin;Password=Molle123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -55,14 +55,16 @@ public class CategoryController : ControllerBase
         }
     }
 
-    private void SearchProduct()
+    private async Task SearchProduct()
     {
-        var productName = CategoryView.SearchView();
+        var searchedText = CategoryView.SearchView();
         
         using var db = new WebStoreContext();
         // Söker i databasen efter produkter vars namn innehåller det som användaren skrev (fritextsökning).
-        var products = db.Products.Where(p => EF.Functions.Like(p.Name, $"%{productName}%")).OrderBy(p => p.Name).ToList();
+        var products = await db.Products.Where(p => EF.Functions.Like(p.Name, $"%{searchedText}%")).OrderBy(p => p.Name).ToListAsync();
 
+        await MongoLogger.LogProductSearchAsync(searchedText, Session.CurrentCustomer);
+        
         if (products.Count < 1)
         {
             CategoryView.SearchError("Varan hittades ej");

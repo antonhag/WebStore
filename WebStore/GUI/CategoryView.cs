@@ -37,8 +37,8 @@ public class CategoryView
         searchWindow.Draw();
         
         Console.SetCursorPosition(10, 19);
-        var productName = Console.ReadLine();
-        return productName;
+        var searchedText = Console.ReadLine();
+        return searchedText;
     }
 
     public static void ShowSearchResults(List<Product> products)

@@ -44,6 +44,9 @@ public class StatsController : ControllerBase
                 // Visa försäljning per leverantör
                 ShowSalesBySupplierAsync().GetAwaiter().GetResult();
                 return true;
+            case '7':
+                StatsView.ShowSearchHistoryView().GetAwaiter().GetResult();
+                return true;
             case '9':
                 return false;
             default:
