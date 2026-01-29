@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WebStore.Data;
 using WebStore.Models;
 
@@ -12,7 +13,7 @@ public class AdminView
         Adminstrera_kunder,
         Ändra_utvalda_produkter,
         Se_statistik,
-        Återgå_till_startsida = 9
+        Logga_ut = 9
     }
     
     private enum ManageProductsMenu
@@ -182,8 +183,8 @@ public class AdminView
         return upperKey;
     }
 
-    public static (string productName, string description, decimal price, int productCategory, string supplier, int
-        stockQuantity) AddProductView()
+    public static async Task<(string productName, string description, decimal price, int productCategory, string supplier, int
+        stockQuantity)> AddProductView()
     {
         using var db = new WebStoreContext();
         
@@ -212,7 +213,7 @@ public class AdminView
 
         Console.Clear();
         
-        var categories = db.Categories.ToList();
+        var categories = await db.Categories.ToListAsync();
         Console.WriteLine("Tillgängliga kategorier:");
         foreach (var c in categories)
         {
@@ -287,14 +288,14 @@ public class AdminView
         return name;
     }
 
-    public static int DeleteCategoryView()
+    public static async Task<int> DeleteCategoryViewAsync()
     {
         Console.Clear();
         Console.WriteLine("--------- Ta bort produktkategori ---------\n");
         
         using var db = new WebStoreContext();
         
-        var categories = db.Categories.ToList();
+        var categories = await db.Categories.ToListAsync();
 
         foreach (var c in categories)
         {
@@ -323,14 +324,14 @@ public class AdminView
         return categoryId;
     }
 
-    public static (int categoryId, string newName) ChangeCategoryView()
+    public static async Task<(int categoryId, string newName)> ChangeCategoryView()
     {
         Console.Clear();
         Console.WriteLine("--------- Ändra produktkategori ---------\n");
         
         using var db = new WebStoreContext();
         
-        var categories = db.Categories.ToList();
+        var categories = await db.Categories.ToListAsync();
 
         foreach (var c in categories)
         {

@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WebStore.Data;
 using WebStore.GUI;
 using WebStore.Models;
@@ -6,40 +7,50 @@ namespace WebStore.Controllers;
 
 public class ShippingController : ControllerBase
 {
-    protected override void DrawView()
+    protected override async Task DrawViewAsync()
     {
         Console.Clear();
         ShippingView.Show();
     }
 
-    protected override bool HandleInput()
+    protected override async Task<bool> HandleInputAsync()
     {
-        var key = Console.ReadKey(true).Key;
-
-        switch (key)
+        try
         {
-            case ConsoleKey.J:
-                var newAddress = ShippingView.ChangeShippingAddressView();
-                if (!string.IsNullOrWhiteSpace(newAddress))
-                {
-                    Session.TemporaryShippingAddress = newAddress;
-                    Session.IsShippingAddressChanged = true;
-                }
-                return true;
-            case ConsoleKey.N:
-                HandleDeliveryInput();
-                return true;
-            case ConsoleKey.D9:
-                return false;
-            default:
-                ShowError("Ogiltigt val! FRAKT");
-                return true;
+            var key = Console.ReadKey(true).Key;
+
+            switch (key)
+            {
+                case ConsoleKey.J:
+                    var newAddress = ShippingView.ChangeShippingAddressView();
+                    if (!string.IsNullOrWhiteSpace(newAddress))
+                    {
+                        Session.TemporaryShippingAddress = newAddress;
+                        Session.IsShippingAddressChanged = true;
+                    }
+
+                    return true;
+                case ConsoleKey.N:
+                    await HandleDeliveryInputAsync();
+                    return true;
+                case ConsoleKey.D9:
+                    return false;
+                default:
+                    ShowError("Ogiltigt val! FRAKT");
+                    return true;
+            }
         }
+        catch (Exception ex)
+        {
+            ShowError($"Ett fel inträffade: {ex.Message}");
+            return true;
+        }
+   
     }
     
-    private void HandleDeliveryInput()
+    private async Task HandleDeliveryInputAsync()
     {
-        ShippingView.ShowDeliveryOptions();
+        await ShippingView.ShowDeliveryOptions();
         
         var key = Console.ReadKey(true).Key;
 
@@ -65,7 +76,7 @@ public class ShippingController : ControllerBase
 
         using var db = new WebStoreContext();
 
-        var deliveryOption = db.DeliveryOptions.FirstOrDefault(d => d.Id == deliveryOptionId);
+        var deliveryOption = await db.DeliveryOptions.FirstOrDefaultAsync(d => d.Id == deliveryOptionId);
 
         if (deliveryOption == null)
         {
@@ -75,6 +86,6 @@ public class ShippingController : ControllerBase
         
         Session.SelectedDeliveryOption = deliveryOption;
 
-        new CheckoutController().Run();
+        await new CheckoutController().RunAsync();
     }
 }

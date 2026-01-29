@@ -5,8 +5,8 @@ namespace WebStore;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        Shop.Run();
+        await Shop.RunAsync();
     }
 }

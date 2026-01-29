@@ -16,55 +16,63 @@ public class ProductController : ControllerBase
         _categoryId = categoryId;
     }
 
-    protected override void DrawView()
+    protected override async Task DrawViewAsync()
     {
-        _dealsList = HeaderView.ShowWithDeals();
-        ProductListView.Show(_categoryId);
+        _dealsList = await HeaderView.ShowWithDealsAsync();
+        await ProductListView.ShowAsync(_categoryId);
     }
 
-    protected override bool HandleInput()
+    protected override async Task<bool> HandleInputAsync()
     {
-        using var db = new WebStoreContext();
-        var products = db.Products.Where(p => p.CategoryId == _categoryId).OrderBy(p => p.Id).ToList();
-
-        var key = Console.ReadKey(true).KeyChar;
-        char upperKey = char.ToUpper(key);
+        try
+        {
+            using var db = new WebStoreContext();
+            var products = await db.Products.Where(p => p.CategoryId == _categoryId).OrderBy(p => p.Id).ToListAsync();
+            
+            var key = Console.ReadKey(true).KeyChar;
+            char upperKey = char.ToUpper(key);
         
-        if (upperKey == 'A' || upperKey == 'B' || upperKey == 'C')
-        {
-            DealsHelper.HandleDealInput(_dealsList, upperKey);
-            return true;
-        }
-
-        if (char.IsDigit(upperKey))
-        {
-            int index = upperKey - '0';
-
-            if (index >= 1 && index <= products.Count)
+            if (upperKey == 'A' || upperKey == 'B' || upperKey == 'C')
             {
-                int productId = products[index - 1].Id;
-                
-                ProductListView.ShowDetails(productId);
-                var key2 = char.ToUpper(Console.ReadKey(true).KeyChar);
-                if (key2 == 'B')
-                {
-                    BuyProduct(productId);
-                }
+                await DealsHelper.HandleDealInput(_dealsList, upperKey);
                 return true;
             }
-        }
 
-        switch (upperKey)
+            if (char.IsDigit(upperKey))
+            {
+                int index = upperKey - '0';
+
+                if (index >= 1 && index <= products.Count)
+                {
+                    int productId = products[index - 1].Id;
+                
+                    await ProductListView.ShowDetailsAsync(productId);
+                    var key2 = char.ToUpper(Console.ReadKey(true).KeyChar);
+                    if (key2 == 'B')
+                    {
+                        await BuyProductAsync(productId);
+                    }
+                    return true;
+                }
+            }
+
+            switch (upperKey)
+            {
+                case '9':
+                    return false;
+                default:
+                    ShowError("Ogiltigt val!");
+                    return true;
+            }
+        }
+        catch (Exception ex)
         {
-            case '9':
-                return false;
-            default:
-                ShowError("Ogiltigt val!");
-                return true;
+            ShowError($"Ett fel inträffade:  {ex.Message}");
+            return true;
         }
     }
 
-    private void BuyProduct(int productId)
+    private async Task BuyProductAsync(int productId)
     {
         using var db = new WebStoreContext();
 
@@ -74,23 +82,23 @@ public class ProductController : ControllerBase
             return;
         }
 
-        var quantity = ProductListView.BuyProductView(productId);
+        var quantity = await ProductListView.BuyProductViewAsync(productId);
         if (quantity <= 0)
             return;
 
-        var product = db.Products.First(p => p.Id == productId);
+        var product = await db.Products.FirstAsync(p => p.Id == productId);
         
         var customerId = Session.CurrentCustomer.Id;
 
-        var cart = db.Carts
+        var cart = await db.Carts
             .Include(c => c.Items)
-            .FirstOrDefault(c => c.CustomerId == customerId);
+            .FirstOrDefaultAsync(c => c.CustomerId == customerId);
 
         if (cart == null)
         {
             cart = new Cart { CustomerId = customerId };
             db.Carts.Add(cart);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         }
 
         var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
@@ -110,6 +118,6 @@ public class ProductController : ControllerBase
             });
         }
         
-        db.SaveChanges();
+        await db.SaveChangesAsync();
     }
 }

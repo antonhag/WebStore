@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WebStore.Controllers;
 using WebStore.Data;
 using WebStore.GUI;
@@ -7,14 +8,14 @@ namespace WebStore.Helpers;
 
 public static class DealsHelper
 {
-    public static List<(char key, Product product)>
-        ShowDeals() // Ritar upp deals och returnerar en lista av produkter med koppling till A, B, C
+    public static async Task<List<(char key, Product product)>>
+        ShowDealsAsync() // Ritar upp deals och returnerar en lista av produkter med koppling till A, B, C
     {
         List<(char key, Product product)> dealsList = new List<(char, Product)>();
 
         using (var db = new WebStoreContext())
         {
-            var deals = db.Products.Where(p => p.SelectedProduct == true).ToList();
+            var deals = await db.Products.Where(p => p.SelectedProduct == true).ToListAsync();
 
             int left = 2;
             int top = 4;
@@ -46,7 +47,7 @@ public static class DealsHelper
         return dealsList;
     }
 
-    public static void HandleDealInput(List<(char key, Product product)> dealsList,
+    public static async Task HandleDealInput(List<(char key, Product product)> dealsList,
         char keyPressed) // Metod för att hantera köp av den dealen som är vald
     {
         var upperKey = char.ToUpper(keyPressed);
@@ -59,6 +60,6 @@ public static class DealsHelper
        }
        
        var categoryController = new CategoryController();
-       categoryController.BuyProduct(selectedDeal.product.Id);
+       await categoryController.BuyProductAsync(selectedDeal.product.Id);
     }
 }

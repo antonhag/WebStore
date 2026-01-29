@@ -6,12 +6,12 @@ namespace WebStore.Controllers;
 
 public class StatsController : ControllerBase
 {
-    protected override void DrawView()
+    protected override async Task DrawViewAsync()
     {
         StatsView.ShowMenu();
     }
 
-    protected override bool HandleInput()
+    protected override async Task<bool> HandleInputAsync()
     {
         var key = Console.ReadKey(true).KeyChar;
 
@@ -22,30 +22,30 @@ public class StatsController : ControllerBase
                 
                 // HandleInput kan ej vara async (ärver från ControllerBase), därför används GetAwaiter().GetResult() för att köra en asynkron
                 // metod synkront och vänta in resultatet innan vi fortsätter
-                ShowBestSwedishCustomersPerRegionAsync().GetAwaiter().GetResult(); 
+                await ShowBestSwedishCustomersPerRegionAsync();
                 return true;
             case '2':
                 // Visa kunder som spenderat mest
-                Show5BestSpendingCustomersAsync().GetAwaiter().GetResult();
+                await Show5BestSpendingCustomersAsync();
                 return true;
             case '3':
                 // Visa populäraste produkter per åldersgrupp
-                ShowPopularProductsByAgeAsync().GetAwaiter().GetResult();
+                await ShowPopularProductsByAgeAsync();
                 return true;
             case '4':
                 // Visa antal kunder per stad
-                ShowCustomersCountPerCityAsync().GetAwaiter().GetResult();
+                await ShowCustomersCountPerCityAsync();
                 return true;
             case '5':
                 // Visa 5 mest populära produkter
-                Show5MostPopularProductAsync().GetAwaiter().GetResult();
+                await Show5MostPopularProductAsync();
                 return true;
             case '6':
                 // Visa försäljning per leverantör
-                ShowSalesBySupplierAsync().GetAwaiter().GetResult();
+                await ShowSalesBySupplierAsync();
                 return true;
             case '7':
-                StatsView.ShowSearchHistoryView().GetAwaiter().GetResult();
+                await StatsView.ShowSearchHistoryView();
                 return true;
             case '9':
                 return false;
@@ -61,7 +61,7 @@ public class StatsController : ControllerBase
         Console.WriteLine("Bäst kunder per region");
 
         string connectionString =
-            "Server=localhost,14330;Database=WebStoreDb;User Id=sa;Password=StrongP@ssw0rd!;TrustServerCertificate=True;";
+            "Server=tcp:webstoredb.database.windows.net,1433;Initial Catalog=WebStoreDb;Persist Security Info=False;User ID=dbadmin;Password=Molle123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
                 
         var sw = Stopwatch.StartNew();
 
@@ -100,15 +100,15 @@ public class StatsController : ControllerBase
         Console.WriteLine("Populäraste produkter av ålder\n");
         
         string connectionString =
-            "Server=localhost,14330;Database=WebStoreDb;User Id=sa;Password=StrongP@ssw0rd!;TrustServerCertificate=True;";
+            "Server=tcp:webstoredb.database.windows.net,1433;Initial Catalog=WebStoreDb;Persist Security Info=False;User ID=dbadmin;Password=Molle123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
         
         var sw = Stopwatch.StartNew();
         
-        Task<Dictionary<string, Dictionary<string, int>>> task = StatsQueries.GetPopularProductsByAgeAsync(connectionString);
+        
         
         Console.WriteLine("Hämtar data...");
         
-        var result = await task;
+        var result = await StatsQueries.GetPopularProductsByAgeAsync(connectionString);
         
         sw.Stop();
         

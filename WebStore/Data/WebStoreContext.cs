@@ -17,6 +17,7 @@ public class WebStoreContext : DbContext
     public DbSet<PaymentMethod> PaymentMethods { get; set; } = null!;
     public DbSet<DeliveryOption> DeliveryOptions { get; set; } = null!;
     public DbSet<CreditCard> CreditCards { get; set; } = null!;
+    public DbSet<Admin> Admins { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

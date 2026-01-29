@@ -7,14 +7,14 @@ namespace WebStore.GUI;
 
 public class CheckoutView
 {
-    public static void Show()
+    public static async Task ShowAsync()
     {
         Console.Clear();
         HeaderView.ShowShopName();
 
         using var db = new WebStoreContext();
         
-        var checkoutCart = db.Carts.Include(c => c.Items).ThenInclude(i => i.Product).FirstOrDefault(c => c.CustomerId == Session.CurrentCustomer.Id);
+        var checkoutCart = await db.Carts.Include(c => c.Items).ThenInclude(i => i.Product).FirstOrDefaultAsync(c => c.CustomerId == Session.CurrentCustomer.Id);
         
         var rows = new List<string>();
         decimal subtotal = 0; // Pris utan frakt och moms

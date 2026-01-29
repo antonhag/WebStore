@@ -7,41 +7,52 @@ namespace WebStore.Controllers;
 
 public class AdminController : ControllerBase
 {
-    protected override void DrawView()
+    protected override async Task DrawViewAsync()
     {
         AdminView.Show();
     }
 
-    protected override bool HandleInput()
+    protected override async Task<bool> HandleInputAsync()
     {
-        var key = Console.ReadKey().KeyChar;
-
-        switch (key)
+        try
         {
-            case '1':
-                ManageProducts();
-                return true;
-            case '2':
-                ManageCategories();
-                return true;
-            case '3':
-                ManageCustomer();
-                return true;
-            case '4':
-                ManageSelectedProducts();
-                return true;
-            case '5':
-                new StatsController().Run();
-                return true;
-            case '9':
-                return false;
-            default:
-                ShowError("Ogiltigt val!");
-                return true;
+            var key = Console.ReadKey().KeyChar;
+
+            switch (key)
+            {
+                case '1':
+                    await ManageProductsAsync();
+                    return true;
+                case '2':
+                    await ManageCategoriesAsync();
+                    return true;
+                case '3':
+                    await ManageCustomerAsync();
+                    return true;
+                case '4':
+                    await ManageSelectedProductsAsync();
+                    return true;
+                case '5':
+                    var statsController = new StatsController();
+                    await statsController.RunAsync();
+                    return true;
+                case '9':
+                    Session.Logout();
+                    return false;
+                default:
+                    ShowError("Ogiltigt val!");
+                    return true;
+            }
         }
+        catch (Exception ex)
+        {
+            ShowError($"Ett fel inträffade: {ex.Message}");
+            return true;
+        }
+     
     }
 
-    private void ManageSelectedProducts()
+    private async Task ManageSelectedProductsAsync()
     {
         while (true)
         {
@@ -58,11 +69,11 @@ public class AdminController : ControllerBase
             if (!int.TryParse(input, out int productId))
             {
                 ShowError("Ogiltigt ID! Ange endast siffror!");
-                return;
+                continue;
             }
 
             using var db = new WebStoreContext();
-            var product = db.Products.FirstOrDefault(p => p.Id == productId);
+            var product = await db.Products.FirstOrDefaultAsync(p => p.Id == productId);
 
             if (product == null)
             {
@@ -70,7 +81,7 @@ public class AdminController : ControllerBase
                 continue;
             }
 
-            int selectedCount = db.Products.Count(p => p.SelectedProduct); // Kollar hur många produkter som är selected
+            int selectedCount = await db.Products.CountAsync(p => p.SelectedProduct); // Kollar hur många produkter som är selected
             if (product.SelectedProduct == false &&
                 selectedCount >= 3) // Ifall användaren försöker markera fler än 3 produkter, gör detta
             {
@@ -79,11 +90,11 @@ public class AdminController : ControllerBase
             }
 
             product.SelectedProduct = !product.SelectedProduct; // Sätter den till motsatsen av vad den är nu
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         }
     }
 
-    private void ManageProducts()
+    private async Task ManageProductsAsync()
     {
         AdminView.ShowAllProducts();
 
@@ -97,7 +108,7 @@ public class AdminController : ControllerBase
 
         if (input?.ToUpper() == "A")
         {
-            AddProduct();
+            await AddProductAsync();
             return;
         }
 
@@ -108,7 +119,7 @@ public class AdminController : ControllerBase
         }
 
         using var db = new WebStoreContext();
-        var product = db.Products.FirstOrDefault(p => p.Id == productId);
+        var product = await db.Products.FirstOrDefaultAsync(p => p.Id == productId);
 
         if (product == null)
         {
@@ -126,10 +137,10 @@ public class AdminController : ControllerBase
         switch (optionInput)
         {
             case '1':
-                ChangeProduct(product);
+                await ChangeProductAsync(product);
                 break;
             case '2':
-                DeleteProduct(product);
+                await DeleteProductAsync(product);
                 break;
             case '9':
                 break;
@@ -139,7 +150,7 @@ public class AdminController : ControllerBase
         }
     }
 
-    private static void ChangeProduct(Product product)
+    private async Task ChangeProductAsync(Product product)
     {
         var result = AdminView.ChangeProductView(product);
         
@@ -164,7 +175,7 @@ public class AdminController : ControllerBase
         
         using var db = new WebStoreContext();
         db.Products.Update(product);
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         
         Console.WriteLine("Produkten uppdaterades!");
@@ -172,7 +183,7 @@ public class AdminController : ControllerBase
         Console.ReadKey(true);
     }
 
-    private static void DeleteProduct(Product product)
+    private async Task DeleteProductAsync(Product product)
     {
         while (true)
         {
@@ -182,7 +193,7 @@ public class AdminController : ControllerBase
             {
                 using var db = new WebStoreContext();
                 db.Products.Remove(product);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
                 Console.WriteLine($"{product.Name} har tagits bort!");
                 Console.WriteLine("Tryck valfri tangent för att fortsätta...");
                 Console.ReadKey(true);
@@ -200,9 +211,9 @@ public class AdminController : ControllerBase
         }
     }
 
-    private static void AddProduct()
+    private async Task AddProductAsync()
     {
-        var productInfo = AdminView.AddProductView();
+        var productInfo = await AdminView.AddProductView();
 
         Product newProduct = new Product
         {
@@ -216,42 +227,50 @@ public class AdminController : ControllerBase
         
         using var db = new WebStoreContext();
         
-        var categoryExists = db.Categories.Any(c => c.Id == newProduct.CategoryId);
+        var categoryExists = await db.Categories.AnyAsync(c => c.Id == newProduct.CategoryId);
         
         db.Products.Add(newProduct);
-        db.SaveChanges();
+        await db.SaveChangesAsync();
 
         Console.WriteLine($"Produkt {newProduct.Name} har lagts till!");
         Console.WriteLine("Tryck valfri tangent för att fortsätta...");
         Console.ReadKey(true);
     }
 
-    private void ManageCategories()
+    private async Task ManageCategoriesAsync()
     {
-        AdminView.ManageCategoriesView();
-        
-        var key = Console.ReadKey(true).KeyChar;
-
-        switch (key)
+        try
         {
-            case '1':
-                AddCategory();
-                break;
-            case '2':
-                DeleteCategory();
-                break;
-            case '3':
-                ChangeCategory();
-                break;
-            case '9':
-                break;
-            default:
-                ShowError("Ogiltigt val!");
-                break;
+            AdminView.ManageCategoriesView();
+
+            var key = Console.ReadKey(true).KeyChar;
+
+            switch (key)
+            {
+                case '1':
+                    await AddCategoryAsync();
+                    break;
+                case '2':
+                    await DeleteCategoryAsync();
+                    break;
+                case '3':
+                    await ChangeCategoryAsync();
+                    break;
+                case '9':
+                    break;
+                default:
+                    ShowError("Ogiltigt val!");
+                    break;
+            }
         }
+        catch (Exception ex)
+        {
+            ShowError("Ett fel inträffade: {ex.Message}");
+        }
+     
     }
 
-    private static void AddCategory()
+    private async Task AddCategoryAsync()
     {
         var categoryName = AdminView.AddCategoryView();
         
@@ -263,23 +282,23 @@ public class AdminController : ControllerBase
         };
         
         db.Categories.Add(newCategory);
-        db.SaveChanges();
+        await db.SaveChangesAsync();
 
         Console.Clear();
         Console.WriteLine($"Kategorin {newCategory.Name} har lagts till!");
         Console.WriteLine("Tryck valfri tangent för att fortsätta...");
         Console.ReadKey(true);    }
 
-    private static void DeleteCategory()
+    private async Task DeleteCategoryAsync()
     {
-        var chosenId = AdminView.DeleteCategoryView();
+        var chosenId = await AdminView.DeleteCategoryViewAsync();
         
         using var db = new WebStoreContext();
         
-        var categoryToDelete = db.Categories.FirstOrDefault(c => c.Id == chosenId);
+        var categoryToDelete = await db.Categories.FirstOrDefaultAsync(c => c.Id == chosenId);
         
         db.Categories.Remove(categoryToDelete);
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         Console.Clear();
         Console.WriteLine($"Kategorin {categoryToDelete.Name} har tagits bort!");
@@ -287,12 +306,12 @@ public class AdminController : ControllerBase
         Console.ReadKey(true);
     }
     
-    private void ChangeCategory()
+    private async Task ChangeCategoryAsync()
     {
-        var (categoryId, newName) = AdminView.ChangeCategoryView();
+        var (categoryId, newName) = await AdminView.ChangeCategoryView();
         
         using var db = new WebStoreContext();
-        var category = db.Categories.FirstOrDefault(c => c.Id == categoryId);
+        var category = await db.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
         
         if (category == null)
         {
@@ -301,7 +320,7 @@ public class AdminController : ControllerBase
         }
         
         category.Name = newName;
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         Console.Clear();
         Console.WriteLine($"Kategorin har uppdaterats!");
@@ -309,7 +328,7 @@ public class AdminController : ControllerBase
         Console.ReadKey(true);
     }
     
-    private void ManageCustomer()
+    private async Task ManageCustomerAsync()
     {
         Console.Clear();
         AdminView.AllCustomers();
@@ -329,7 +348,7 @@ public class AdminController : ControllerBase
         
         using var db = new WebStoreContext();
         
-        var customer =  db.Customers.FirstOrDefault(c => c.Id == customerId);
+        var customer = await db.Customers.FirstOrDefaultAsync(c => c.Id == customerId);
         
         if (customer == null)
         {
@@ -346,13 +365,10 @@ public class AdminController : ControllerBase
         switch (optionInput)
         {
             case '1':
-                ChangeCustomer(customer);
+                await ChangeCustomerAsync(customer);
                 break;
             case '2':
-                CustomerOrderHistory(customerId);
-                break;
-            case '3':
-                
+                await CustomerOrderHistoryAsync(customerId);
                 break;
             case '9':
                 break;
@@ -362,7 +378,7 @@ public class AdminController : ControllerBase
         }
     }
 
-    private void ChangeCustomer(Customer customer)
+    private async Task ChangeCustomerAsync(Customer customer)
     {
         var newCustomerInfo = AdminView.ChangeCustomerView(customer);
         
@@ -381,7 +397,7 @@ public class AdminController : ControllerBase
         
         using var db = new WebStoreContext();
         db.Customers.Update(customer);
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         Console.Clear();
         Console.WriteLine($"Kunduppgifterna har uppdaterats!");
@@ -389,13 +405,11 @@ public class AdminController : ControllerBase
         Console.ReadKey(true);
     }
 
-    private void CustomerOrderHistory(int customerId)
+    private async Task CustomerOrderHistoryAsync(int customerId)
     {
-        var orderHistory = new List<string>();
-        
         using var db = new WebStoreContext();
         
-        var customer = db.Customers.Include(c => c.Orders).ThenInclude(o => o.OrderItems).ThenInclude(oi => oi.Product).FirstOrDefault(c => c.Id == customerId);
+        var customer = await db.Customers.Include(c => c.Orders).ThenInclude(o => o.OrderItems).ThenInclude(oi => oi.Product).FirstOrDefaultAsync(c => c.Id == customerId);
 
         if (customer == null)
         {

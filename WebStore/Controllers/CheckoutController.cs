@@ -7,37 +7,45 @@ namespace WebStore.Controllers;
 
 public class CheckoutController : ControllerBase
 {
-    protected override void DrawView()
+    protected override async Task DrawViewAsync()
     {
-        CheckoutView.Show();
+        await CheckoutView.ShowAsync();
     }
 
-    protected override bool HandleInput()
+    protected override async Task<bool> HandleInputAsync()
     {
-        var key = Console.ReadKey(true).Key;
-
-        switch (key)
+        try
         {
-            case ConsoleKey.D1:
-                ConfirmCheckout(1);
-                return true;
-            case ConsoleKey.D2:
-                ConfirmCheckout(2);
-                return true;
-            case ConsoleKey.D3:
-                ConfirmCheckout(3);
-                return true;
-            case ConsoleKey.D9:
-                return false;
-            default:
-                ShowError("Ogiltigt val!");
-                return true;
+            var key = Console.ReadKey(true).Key;
+
+            switch (key)
+            {
+                case ConsoleKey.D1:
+                    await ConfirmCheckoutAsync(1);
+                    return true;
+                case ConsoleKey.D2:
+                    await ConfirmCheckoutAsync(2);
+                    return true;
+                case ConsoleKey.D3:
+                    await ConfirmCheckoutAsync(3);
+                    return true;
+                case ConsoleKey.D9:
+                    return false;
+                default:
+                    ShowError("Ogiltigt val!");
+                    return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Ett fel inträffade: {ex.Message}");
+            return true;
         }
     }
 
-    private void ConfirmCheckout(int paymentMethodId)
+    private async Task ConfirmCheckoutAsync(int paymentMethodId)
     {
-        CheckCreditCard(paymentMethodId);
+        await CheckCreditCardAsync(paymentMethodId);
         
         CheckoutView.ConfirmCheckoutView();
         
@@ -46,7 +54,7 @@ public class CheckoutController : ControllerBase
         switch (key)
         {
             case ConsoleKey.J:
-                Checkout(paymentMethodId);
+                await CheckoutAsync(paymentMethodId);
                 break;
             case ConsoleKey.N:
                 break;
@@ -56,14 +64,14 @@ public class CheckoutController : ControllerBase
         }
     }
 
-    private void Checkout(int paymentMethodId)
+    private async Task CheckoutAsync(int paymentMethodId)
     {
         using var db = new WebStoreContext();
         
-        CheckCreditCard(paymentMethodId);
+        await CheckCreditCardAsync(paymentMethodId);
         
-        var cart = db.Carts.Include(c => c.Items).ThenInclude(i => i.Product)
-            .FirstOrDefault(c => c.CustomerId == Session.CurrentCustomer.Id);
+        var cart = await db.Carts.Include(c => c.Items).ThenInclude(i => i.Product)
+            .FirstOrDefaultAsync(c => c.CustomerId == Session.CurrentCustomer.Id);
 
         if (Session.IsShippingAddressChanged)
         {
@@ -110,15 +118,15 @@ public class CheckoutController : ControllerBase
         
         db.Orders.Add(order);
         db.Carts.Remove(cart);
-        db.SaveChanges();
+        await db.SaveChangesAsync();
         
         CheckoutView.CheckoutCompletedView(order);
         Console.ReadKey();
         
-        new HomeController().Run();
+        await new CustomerController().RunAsync();
     }
 
-    public static void CheckCreditCard(int paymentMethodId)
+    private static async Task CheckCreditCardAsync(int paymentMethodId)
     {
         using var db = new WebStoreContext();
         
@@ -127,7 +135,7 @@ public class CheckoutController : ControllerBase
             var newCard = CheckoutView.CreditCardView();
             
             db.CreditCards.Add(newCard);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             
             Session.CurrentCustomer.CreditCards.Add(newCard);
 

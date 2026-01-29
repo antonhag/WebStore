@@ -4,7 +4,7 @@ namespace WebStore.Controllers;
 
 public abstract class ControllerBase
 {
-    public void Run()
+    public async Task RunAsync()
     {
         bool running = true;
 
@@ -13,15 +13,14 @@ public abstract class ControllerBase
             try
             {
                 Console.Clear();
-                DrawView();
-                running = HandleInput();
+                await DrawViewAsync();
+                running = await HandleInputAsync();
             }
             catch (Exception ex)
             {
                 Console.Clear();
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Ogiltigt val! BASE");
-                Console.WriteLine("Felmeddelande:");
+                Console.WriteLine("Ett fel inträffade: ");
                 Console.WriteLine(ex.Message);
                 if (ex.InnerException != null)
                 {
@@ -34,8 +33,8 @@ public abstract class ControllerBase
         }
     }
     
-    protected abstract void DrawView();
-    protected abstract bool HandleInput();
+    protected abstract Task DrawViewAsync();
+    protected abstract Task<bool> HandleInputAsync();
 
     public virtual void ShowError(string message)
     {

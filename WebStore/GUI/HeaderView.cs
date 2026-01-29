@@ -17,10 +17,10 @@ public class HeaderView
         header.Draw();
     }
     
-    public static List<(char key, Product product)> ShowWithDeals()
+    public static async Task<List<(char key, Product product)>> ShowWithDealsAsync()
     {
         ShowShopName();
-        return DealsHelper.ShowDeals();
+        return await DealsHelper.ShowDealsAsync();
     }
 }
 

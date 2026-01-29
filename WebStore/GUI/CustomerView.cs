@@ -2,11 +2,11 @@ namespace WebStore.GUI;
 
 public class CustomerView
 {
-    public enum CustomerMenu
+    private enum CustomerMenu
     {
-        Startsida = 1,
-        Shoppen,
-        Varukorgen
+        Shoppen = 1,
+        Varukorgen,
+        Logga_ut = 9
     }
 
     public static void Show()

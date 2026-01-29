@@ -13,8 +13,6 @@ public class ShippingView
         Console.Clear();
         HeaderView.ShowShopName();
         
-        var db = new WebStoreContext();
-
         var customer = Session.CurrentCustomer;
 
         // Ternary operator som kollar ifall adressen är ändrad, (true = skriv ut den nya), (false = skriv ut den befintliga adressen)
@@ -53,7 +51,7 @@ public class ShippingView
         return newAddress;
     }
     
-    public static void ShowDeliveryOptions()
+    public static async Task ShowDeliveryOptions()
     {
         Console.Clear();
         HeaderView.ShowShopName();
@@ -62,9 +60,8 @@ public class ShippingView
         
         using (var db = new WebStoreContext())
         {
-            var deliveryOption = db.DeliveryOptions.ToList();
-    
-            int index = 1;
+            var deliveryOption = await db.DeliveryOptions.ToListAsync();
+            
             foreach (var option in deliveryOption)
             {
                 deliveryOptionList.Add($"{option.Id}. {option.Name} - {option.Description} - {option.EstimatedTime} - {option.Cost} kr");

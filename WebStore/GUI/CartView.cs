@@ -7,7 +7,7 @@ namespace WebStore.GUI;
 
 public class CartView
 {
-    public static void Show()
+    public static void Show(Cart cart)
     {
         if (Session.CurrentCustomer == null)
         {
@@ -16,20 +16,6 @@ public class CartView
             return;
         }
         
-        using var db = new WebStoreContext();
-        
-        var cart = db.Carts.Include(c => c.Items).ThenInclude(i => i.Product).FirstOrDefault(c => c.CustomerId == Session.CurrentCustomer.Id);
-
-        if (cart == null || cart.Items.Count == 0)
-        {
-            var emptyWindow = new Window("Varukorg", 2, 10,
-                new List<string> { "Din varukorg är tom", "Tryck valfri knapp för att gå tillbaka" });
-            emptyWindow.Draw();
-            Console.ReadKey(true);
-            
-            new HomeController().Run();
-        }
-
         var rows = new List<string>();
         decimal total = 0;
 

@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WebStore.Data;
 using WebStore.Models;
 
@@ -5,15 +6,15 @@ namespace WebStore.GUI;
 
 public class ProductListView
 {
-    public static void Show(int categoryId)
+    public static async Task ShowAsync(int categoryId)
     {
         Console.Clear();
-        HeaderView.ShowWithDeals();
+        await HeaderView.ShowWithDealsAsync();
         var productList = new List<string>();
 
         using (var db = new WebStoreContext())
         {
-            var products = db.Products.Where(p => p.CategoryId == categoryId).OrderBy(p => p.Id).ToList();
+            var products = await db.Products.Where(p => p.CategoryId == categoryId).OrderBy(p => p.Id).ToListAsync();
 
             int index = 1;
 
@@ -30,12 +31,12 @@ public class ProductListView
         productWindow.Draw();
     }
 
-    public static void ShowDetails(int productId)
+    public static async Task ShowDetailsAsync(int productId)
     {
         Console.Clear();
-        HeaderView.ShowWithDeals();
+        await HeaderView.ShowWithDealsAsync();
         using var db = new WebStoreContext();
-        var product = db.Products.FirstOrDefault(p => p.Id == productId);
+        var product = await db.Products.FirstOrDefaultAsync(p => p.Id == productId);
 
         if (product == null)
         {
@@ -57,11 +58,11 @@ public class ProductListView
         detailWindow.Draw();
     }
 
-    public static int BuyProductView(int productId)
+    public static async Task<int> BuyProductViewAsync(int productId)
     {
         using var db = new WebStoreContext();
 
-        var product = db.Products.FirstOrDefault(p => p.Id == productId);
+        var product = await db.Products.FirstOrDefaultAsync(p => p.Id == productId);
 
         if (product == null)
         {
@@ -75,8 +76,8 @@ public class ProductListView
         while (true)
         {
             Console.Clear();
-            HeaderView.ShowWithDeals();
-            ShowDetails(product.Id);
+            await HeaderView.ShowWithDealsAsync();
+            await ShowDetailsAsync(product.Id);
             var buyWindow = new Window($"Antal av: {product.Name}", 2, 18, new List<string> { "Ange antal: ", "[0] För att avbryta" });
             buyWindow.Draw();
 
@@ -104,7 +105,7 @@ public class ProductListView
             break;
         }
         
-        ShowConfirmation(product, quantity);
+        await ShowConfirmation(product, quantity);
         return quantity;
     }
 
@@ -134,10 +135,10 @@ public class ProductListView
         Console.ReadKey(true);
     }
 
-    private static void ShowConfirmation(Product product, int quantity)
+    private static async Task ShowConfirmation(Product product, int quantity)
     {
         Console.Clear();
-        HeaderView.ShowWithDeals();
+        await HeaderView.ShowWithDealsAsync();
         
         var confirmationWindow = new Window("Tillagd i varukorgen", 2, 10,
             new List<string>
