@@ -1,10 +1,14 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using WebStore.Helpers;
 using WebStore.Models;
 
 namespace WebStore.Data;
 
 public class WebStoreContext : DbContext
 {
+    private readonly string _connectionString = ConnectionStringHelper.GetSqlConnectionString();
+    
     public DbSet<Product> Products { get; set; } = null!;
     public DbSet<Category> Categories { get; set; } = null!;
     public DbSet<Customer> Customers { get; set; } = null!;
@@ -19,11 +23,12 @@ public class WebStoreContext : DbContext
     public DbSet<CreditCard> CreditCards { get; set; } = null!;
     public DbSet<Admin> Admins { get; set; } = null!;
 
+    
+    
+    
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        // optionsBuilder.UseSqlServer("Server=localhost,14330;Database=WebStoreDb;User Id=sa;Password=StrongP@ssw0rd!;TrustServerCertificate=True;");
-        
-        optionsBuilder.UseSqlServer("Server=tcp:webstoredb.database.windows.net,1433;Initial Catalog=WebStoreDb;Persist Security Info=False;User ID=dbadmin;Password=Molle123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+        optionsBuilder.UseSqlServer(_connectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

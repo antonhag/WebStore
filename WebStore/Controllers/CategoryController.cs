@@ -1,6 +1,7 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver.Core.Configuration;
 using WebStore.Data;
 using WebStore.GUI;
 using WebStore.Helpers;
@@ -72,9 +73,7 @@ public class CategoryController : ControllerBase
     {
         var categoriesString = new List<string>();
         
-        var connectionString =
-            "Server=tcp:webstoredb.database.windows.net,1433;Initial Catalog=WebStoreDb;Persist Security Info=False;User ID=dbadmin;Password=Molle123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-
+        var connectionString = ConnectionStringHelper.GetSqlConnectionString();
         using var connection = new SqlConnection(connectionString);
 
         var sql = "SELECT Id, Name FROM webstore.Categories"; // Dapper
@@ -107,7 +106,7 @@ public class CategoryController : ControllerBase
             return;
         }
 
-        CategoryView.ShowSearchResults(products);
+        CategoryView.ShowSearchResultsAsync(products);
         await HandleSearchInputAsync(products);
     }
 

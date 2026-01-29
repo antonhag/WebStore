@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.Data.SqlClient;
 using WebStore.GUI;
+using WebStore.Helpers;
 
 namespace WebStore.Controllers;
 
@@ -60,8 +61,7 @@ public class StatsController : ControllerBase
         Console.Clear();
         Console.WriteLine("Bäst kunder per region");
 
-        string connectionString =
-            "Server=tcp:webstoredb.database.windows.net,1433;Initial Catalog=WebStoreDb;Persist Security Info=False;User ID=dbadmin;Password=Molle123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        string connectionString = ConnectionStringHelper.GetSqlConnectionString();
                 
         var sw = Stopwatch.StartNew();
 
@@ -99,9 +99,8 @@ public class StatsController : ControllerBase
         Console.Clear();
         Console.WriteLine("Populäraste produkter av ålder\n");
         
-        string connectionString =
-            "Server=tcp:webstoredb.database.windows.net,1433;Initial Catalog=WebStoreDb;Persist Security Info=False;User ID=dbadmin;Password=Molle123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-        
+        string connectionString =  ConnectionStringHelper.GetSqlConnectionString();
+            
         var sw = Stopwatch.StartNew();
         
         

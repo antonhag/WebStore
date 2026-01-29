@@ -1,4 +1,5 @@
 using MongoDB.Driver;
+using WebStore.Helpers;
 
 namespace WebStore.Mongo;
 
@@ -6,8 +7,7 @@ public class MongoDbContext
 {
     private static MongoClient GetClient()
     {
-        string connectionString =
-            "mongodb+srv://antonhagstrom_db_user:AFi2YJPedup3uDm7@webstore.gye6cg2.mongodb.net/?appName=Webstore";
+        string connectionString = ConnectionStringHelper.GetMongoConnectionString();
 
         MongoClientSettings settings = MongoClientSettings.FromUrl(new MongoUrl(connectionString));
         

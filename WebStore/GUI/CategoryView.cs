@@ -10,6 +10,7 @@ public class CategoryView
 {
     public static void Show(List<string> categories)
     {
+        categories.Add("S. För att söka efter produkter");
         categories.Add("9. För att gå tillbaka till menyn");
         var categoryWindow = new Window ("Kategorier", 2, 10, categories);
         
@@ -26,10 +27,10 @@ public class CategoryView
         return searchedText;
     }
 
-    public static void ShowSearchResults(List<Product> products)
+    public static async Task ShowSearchResultsAsync(List<Product> products)
     {
         Console.Clear();
-        HeaderView.ShowWithDealsAsync();
+        await HeaderView.ShowWithDealsAsync();
         
         var rows = new List<string>();
         int index = 1;
@@ -45,10 +46,10 @@ public class CategoryView
         resultWindow.Draw();
     }
 
-    public static void SearchError(string message)
+    public static async Task SearchError(string message)
     {
         Console.Clear();
-        HeaderView.ShowWithDealsAsync();
+        await HeaderView.ShowWithDealsAsync();
         
         var errorWindow = new Window ("Fel", 2, 10, new List<string> { message, "Tryck valfri knapp för att gå tillbaka" });
         errorWindow.Draw();
