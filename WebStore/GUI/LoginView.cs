@@ -1,4 +1,5 @@
 using WebStore.Controllers;
+using WebStore.Helpers;
 using WebStore.Models;
 
 namespace WebStore.GUI;
@@ -51,7 +52,7 @@ public class LoginView
         var emailOrUserName = Console.ReadLine();
         
         Console.SetCursorPosition(14, 9 + 4);
-        var password = Console.ReadLine();
+        string password = PasswordHelper.ReadPassword();
         
         return (emailOrUserName, password);
     }
