@@ -54,6 +54,7 @@ public class WebStoreContext : DbContext
             .HasForeignKey(c => c.CountryId)
             .OnDelete(DeleteBehavior.Restrict);
         
+        // En kund måste ha en stad och en stad kan ha flera kunder, en stad kan inte tas bort som det finns kunder kopplade till den
         modelBuilder.Entity<Customer>()
             .HasOne(c => c.City)
             .WithMany(c => c.Customers)
