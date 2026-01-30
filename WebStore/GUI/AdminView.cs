@@ -15,7 +15,7 @@ public class AdminView
         Se_statistik,
         Logga_ut = 9
     }
-    
+
     private enum ManageProductsMenu
     {
         Ändra_produkt = 1,
@@ -46,16 +46,16 @@ public class AdminView
         {
             adminOptions.Add($"{i}. {Enum.GetName(typeof(AdminMenu), i).Replace("_", " ")}");
         }
-        
+
         var adminWindow = new Window("Admin || Välj alternativ", 2, 2, adminOptions);
-        
+
         adminWindow.Draw();
     }
 
     public static void ShowAllProducts()
     {
         Console.Clear();
-        var productList  = new List<string>();
+        var productList = new List<string>();
         var info = new List<string>
         {
             "Ange Produkt-ID: ",
@@ -67,16 +67,16 @@ public class AdminView
         using (var db = new WebStoreContext())
         {
             var products = db.Products.ToList();
-            
+
             productList.Add(
                 "ID".PadRight(10) +
                 "Produkt".PadRight(25) +
                 "Pris".PadRight(15) +
                 "Utvald"
             );
-            
+
             productList.Add(new string('-', 60));
-            
+
             foreach (var product in products)
             {
                 productList.Add(
@@ -86,10 +86,10 @@ public class AdminView
                     (product.SelectedProduct ? "   X" : "")
                 );
             }
-            
-            var window =  new Window("Alla produkter", 2, 2, productList);
+
+            var window = new Window("Alla produkter", 2, 2, productList);
             window.Draw();
-            
+
             var window2 = new Window("Meny", 2, 30, info);
             window2.Draw();
         }
@@ -98,34 +98,35 @@ public class AdminView
     public static void ManageProductsView()
     {
         Console.Clear();
-        
+
         var productOptions = new List<string>();
 
         foreach (int i in Enum.GetValues(typeof(ManageProductsMenu)))
         {
             productOptions.Add($"{i}. {Enum.GetName(typeof(ManageProductsMenu), i).Replace("_", " ")}");
         }
-        
+
 
         var productOption = new Window("Välj alternativ", 2, 2, productOptions);
-        
+
         productOption.Draw();
     }
 
-    public static (string? productName,string? description, decimal? price, int? productCategory, string? supplier, int? stockQuantity) ChangeProductView(Product product)
+    public static (string? productName, string? description, decimal? price, int? productCategory, string? supplier, int
+        ? stockQuantity) ChangeProductView(Product product)
     {
         Console.Clear();
         Console.WriteLine("--------- Ändra produkt ---------\n");
         Console.WriteLine("Lämna fältet tomt för oförändrat\n");
-        
+
         Console.WriteLine($"Tidigare produktnamn: {product.Name}");
         Console.Write("Ange nytt produktnamn: ");
         var newName = Console.ReadLine();
-        
+
         Console.WriteLine($"Tidigare beskrivning: {product.Description}");
         Console.Write("Ange ny beskrivning: ");
         var newDesc = Console.ReadLine();
-        
+
         Console.WriteLine($"Tidigare pris: {product.Price}");
         Console.Write("Ange nytt pris: ");
         var priceInput = Console.ReadLine();
@@ -135,7 +136,7 @@ public class AdminView
         {
             newPrice = parsedPrice;
         }
-        
+
         Console.WriteLine($"Tidigare kategori-id: {product.CategoryId}");
         Console.Write("Ange ny kategori-Id: ");
         var categoryInput = Console.ReadLine();
@@ -146,11 +147,11 @@ public class AdminView
         {
             newCategory = parsedCategory;
         }
-        
+
         Console.WriteLine($"Tidigare leverantör: {product.Supplier}");
         Console.Write("Ange ny leverantör (lämna tom för oförändrat): ");
         var newSupplier = Console.ReadLine();
-        
+
         Console.WriteLine($"Tidigare lagerantal: {product.StockQuantity}");
         Console.Write("Ange nytt lagerantal (lämna tom för oförändrat): ");
         var stockInput = Console.ReadLine();
@@ -161,7 +162,7 @@ public class AdminView
         {
             newStock = parsedStock;
         }
-        
+
         return (
             newName,
             newDesc,
@@ -179,15 +180,16 @@ public class AdminView
         Console.WriteLine($"Är du säker på att du vill radera {product.Name}?\n Tryck (j/n)");
         var key = Console.ReadKey(true).KeyChar;
         char upperKey = char.ToUpper(key);
-        
+
         return upperKey;
     }
 
-    public static async Task<(string productName, string description, decimal price, int productCategory, string supplier, int
+    public static async Task<(string productName, string description, decimal price, int productCategory, string
+        supplier, int
         stockQuantity)> AddProductView()
     {
         using var db = new WebStoreContext();
-        
+
         Console.Clear();
         Console.WriteLine("--------- Lägg till ny produkt ---------\n");
 
@@ -201,25 +203,26 @@ public class AdminView
 
         Console.Write("Beskrivning: ");
         var desc = Console.ReadLine() ?? ""; // Om användaren inte skriver något (null), sätt desc till tom sträng
-        
+
         decimal price;
         while (true)
         {
             Console.Write("Pris: ");
-            if (decimal.TryParse(Console.ReadLine(), out price) && price > 0) // Break ifall det stämmer, annars skriv felmeddelande
+            if (decimal.TryParse(Console.ReadLine(), out price) &&
+                price > 0) // Break ifall det stämmer, annars skriv felmeddelande
                 break;
             Console.WriteLine("Fel: Ange ett giltigt pris större än 0.");
         }
 
         Console.Clear();
-        
+
         var categories = await db.Categories.ToListAsync();
         Console.WriteLine("Tillgängliga kategorier:");
         foreach (var c in categories)
         {
             Console.WriteLine($"{c.Id}: {c.Name}");
         }
-        
+
         int categoryId;
         while (true)
         {
@@ -241,7 +244,7 @@ public class AdminView
 
         Console.Write("Leverantör: ");
         var supplier = Console.ReadLine();
-        
+
         int stock;
         while (true)
         {
@@ -250,24 +253,24 @@ public class AdminView
                 break;
             Console.WriteLine("Fel: Lagerantal måste vara 0 eller högre.");
         }
-        
+
         return (name, desc, price, categoryId, supplier, stock);
     }
-    
+
     public static void ManageCategoriesView()
     {
         Console.Clear();
-        
+
         var categoryOptions = new List<string>();
 
         foreach (int i in Enum.GetValues(typeof(ManageCategoriesMenu)))
         {
             categoryOptions.Add($"{i}. {Enum.GetName(typeof(ManageCategoriesMenu), i).Replace("_", " ")}");
         }
-        
+
 
         var categoryOption = new Window("Välj alternativ", 2, 2, categoryOptions);
-        
+
         categoryOption.Draw();
     }
 
@@ -284,7 +287,7 @@ public class AdminView
             Console.Write("Kategorinamn får inte vara tomt försök igen: ");
             name = Console.ReadLine();
         }
-        
+
         return name;
     }
 
@@ -292,9 +295,9 @@ public class AdminView
     {
         Console.Clear();
         Console.WriteLine("--------- Ta bort produktkategori ---------\n");
-        
+
         using var db = new WebStoreContext();
-        
+
         var categories = await db.Categories.ToListAsync();
 
         foreach (var c in categories)
@@ -305,22 +308,35 @@ public class AdminView
         int categoryId;
         while (true)
         {
-            Console.Write("Välj kategori-id du vill radera: ");
+            Console.Write("Välj kategori-id du vill radera (0 för att avbryta): ");
             if (!int.TryParse(Console.ReadLine(), out categoryId))
             {
                 Console.WriteLine("Fel: Ange en siffra.");
                 continue;
             }
 
-            if (!db.Categories.Any(c => c.Id == categoryId))
+            if (categoryId == 0)
+            {
+                return 0;
+            }
+
+            var category = await db.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == categoryId);
+
+            if (category == null)
             {
                 Console.WriteLine($"Fel: Kategori med ID {categoryId} finns inte. Försök igen.");
                 continue;
             }
 
+            if (category.Products.Any())
+            {
+                Console.WriteLine("Fel: Kan inte radera kategori som innehåller produkter. Ta bort produkterna först. Tryck valfri tangent för att gå tillbaka...");
+                Console.ReadKey(true);
+                return 0;
+            }
+
             break; // giltigt kategori-id
         }
-        
         return categoryId;
     }
 
@@ -328,9 +344,9 @@ public class AdminView
     {
         Console.Clear();
         Console.WriteLine("--------- Ändra produktkategori ---------\n");
-        
+
         using var db = new WebStoreContext();
-        
+
         var categories = await db.Categories.ToListAsync();
 
         foreach (var c in categories)
@@ -356,8 +372,10 @@ public class AdminView
 
             break; // giltigt kategori-id
         }
-        var categoryToChange = db.Categories.FirstOrDefault(c => c.Id == categoryId); // för att kunna se tidigare kategorinamn
-        
+
+        var categoryToChange =
+            db.Categories.FirstOrDefault(c => c.Id == categoryId); // för att kunna se tidigare kategorinamn
+
         Console.Clear();
         Console.WriteLine($"Tidigare kategorinamn:  {categoryToChange.Name}");
         Console.Write("Ange nytt kategorinamn: ");
@@ -367,23 +385,23 @@ public class AdminView
             Console.Write("Kategorinamn får inte vara tomt försök igen: ");
             newName = Console.ReadLine();
         }
-        
+
         return (categoryId, newName);
     }
 
     public static void ManageCustomerView()
     {
         Console.Clear();
-        
+
         var customerOptions = new List<string>();
 
         foreach (int i in Enum.GetValues(typeof(ManageCustomerMenu)))
         {
             customerOptions.Add($"{i}. {Enum.GetName(typeof(ManageCustomerMenu), i).Replace("_", " ")}");
         }
-        
+
         var window = new Window("Admin || Välj alternativ", 2, 2, customerOptions);
-        
+
         window.Draw();
     }
 
@@ -391,7 +409,7 @@ public class AdminView
     {
         Console.Clear();
         Console.WriteLine("--------- Alla kunder ---------\n");
-        
+
         using var db = new WebStoreContext();
         var customers = db.Customers.ToList();
 
@@ -401,12 +419,13 @@ public class AdminView
         }
 
         Console.WriteLine("-------------------------------");
-        
+
         Console.WriteLine("\nB = Återgå till menyn");
         Console.Write("Ange kund-id för den du vill välja: ");
     }
-    
-    public static (string? newEmail, string? newPhoneNumber, string? newPassword, string? newStreet) ChangeCustomerView(Customer customer) // Tar in customer objekt för att kunna se tidigare mail, nummer osv
+
+    public static (string? newEmail, string? newPhoneNumber, string? newPassword, string? newStreet)
+        ChangeCustomerView(Customer customer) // Tar in customer objekt för att kunna se tidigare mail, nummer osv
     {
         Console.Clear();
         Console.WriteLine("--------- Ändra kunduppgifter ---------\n");
@@ -415,11 +434,11 @@ public class AdminView
         Console.WriteLine($"Tidigare email: {customer.Email}");
         Console.Write("Ange ny email: ");
         var newEmail = Console.ReadLine();
-        
+
         Console.WriteLine($"Tidigare telefonnummer: {customer.PhoneNumber}");
         Console.Write("Ange nytt telefonnummer: ");
         var newPhoneNumber = Console.ReadLine();
-        
+
         Console.WriteLine($"Tidigare lösenord: {customer.Password}");
         Console.Write("Ange nytt lösenord: ");
         var newPassword = Console.ReadLine();
@@ -430,7 +449,7 @@ public class AdminView
 
         return (newEmail, newPhoneNumber, newPassword, newStreet);
     }
-    
+
     public static void CustomerOrderHistoryView(Customer customer)
     {
         Console.Clear();
@@ -454,10 +473,10 @@ public class AdminView
             {
                 Console.WriteLine($"  - {item.Product.Name} x{item.Quantity} | {item.Product.Price} kr");
             }
-            
+
             Console.WriteLine(new string('-', 40)); // Snyggt radbryt
         }
-        
+
         Console.WriteLine("\nTryck valfri tangent för att gå tillbaka...");
         Console.ReadKey(true);
     }

@@ -34,5 +34,35 @@ public class WebStoreContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("webstore");
+        
+        // Kund email måste vara unik
+        modelBuilder.Entity<Customer>()
+            .HasIndex(c => c.Email)
+            .IsUnique();
+        
+        // Ser till så att det inte går att radera en kategori med produkter i.
+        modelBuilder.Entity<Category>()
+            .HasMany(c => c.Products)
+            .WithOne(p => p.Category)
+            .HasForeignKey(p => p.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        // Ser till så att det inte går att radera en ett land med städer i.
+        modelBuilder.Entity<Country>()
+            .HasMany(c => c.Cities)
+            .WithOne(c => c.Country)
+            .HasForeignKey(c => c.CountryId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Customer>()
+            .HasOne(c => c.City)
+            .WithMany(c => c.Customers)
+            .HasForeignKey(c => c.CityId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        // Ser till att standardvärde för StockQuantity blir 0 istället för null
+        modelBuilder.Entity<Product>()
+            .Property(p => p.StockQuantity)
+            .HasDefaultValue(0);
     }
 }

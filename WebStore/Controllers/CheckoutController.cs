@@ -99,7 +99,7 @@ public class CheckoutController : ControllerBase
             DeliveryStreet = Session.IsShippingAddressChanged
                 ? Session.TemporaryShippingAddress
                 : Session.CurrentCustomer.Street,
-            DeliveryCityId = Session.CurrentCustomer.CityId.Value,
+            DeliveryCityId = Session.CurrentCustomer.CityId,
             OrderDate = DateTime.Now,
             TotalAmount = total,
             OrderItems = cart.Items.Select(i => new OrderItem

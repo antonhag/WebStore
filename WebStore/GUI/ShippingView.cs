@@ -23,6 +23,7 @@ public class ShippingView
             $"Namn: {customer.FirstName} {customer.LastName}",
             $"Stad: {customer.City.Name}",
             $"Adress: {addressToShow}",
+            $"Postnummer: {customer.ZipCode}",
             "Vill du ändra adress? (j/n)",
             "Tryck 9 för att gå tillbaka till menyn"
         };

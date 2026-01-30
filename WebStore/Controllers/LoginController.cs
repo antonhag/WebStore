@@ -91,7 +91,7 @@ public class LoginController : ControllerBase
     {
         var cities = await GetCitiesAsync();
         
-        var (firstName, lastName, phoneNumber, email, password, birthDate, street, cityId) = LoginView.NewCustomerView(cities);
+        var (firstName, lastName, phoneNumber, email, password, birthDate, street, zipCode, cityId) = LoginView.NewCustomerView(cities);
         
         using var db = new WebStoreContext();
         var newCustomer = new Customer
@@ -103,6 +103,7 @@ public class LoginController : ControllerBase
             Password = password,
             BirthDate = birthDate,
             Street = street,
+            ZipCode = zipCode,
             CityId = cityId
         };
         
