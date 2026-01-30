@@ -23,10 +23,12 @@ public class CategoryController : ControllerBase
 
     protected override async Task<bool> HandleInputAsync()
     {
+        var categories = await GetCategoriesAsync();
+        
         try
         {
-            var key = Console.ReadKey(true).KeyChar;
-            char upperKey = char.ToUpper(key);
+            var keyChar = Console.ReadKey(true).KeyChar;
+            char upperKey = char.ToUpper(keyChar);
 
             if (upperKey == 'A' || upperKey == 'B' || upperKey == 'C')
             {
@@ -34,33 +36,32 @@ public class CategoryController : ControllerBase
                 return true;
             }
 
-            switch (upperKey)
+            if (upperKey == 'S')
             {
-                case '1':
-                    var productController1 = new ProductController(1);
-                    await productController1.RunAsync();
-                    return true;
-                case '2':
-                    var productController2 = new ProductController(2);
-                    await productController2.RunAsync();
-                    return true;
-                case '3':
-                    var productController3 = new ProductController(3);
-                    await productController3.RunAsync();
-                    return true;
-                case '4':
-                    var productController4 = new ProductController(4);
-                    await productController4.RunAsync();
-                    return true;
-                case 'S':
-                    await SearchProductAsync();
-                    return true;
-                case '9':
-                    return false;
-                default:
-                    ShowError("Ogiltigt val!");
-                    return true;
+                await SearchProductAsync();
+                return true;
             }
+
+            if (upperKey == '9')
+            {
+                return false;
+            }
+
+            // Fixade till dynamiska kategorier
+            if (char.IsDigit(keyChar))
+            {
+                int categoryId = keyChar - '0';
+
+                if (categoryId >= 1 && categoryId <= categories.Count)
+                {
+                    var productController = new ProductController(categoryId);
+                    await productController.RunAsync();
+                    return true;
+                }
+            }
+
+            ShowError("Ogiltigt val!");
+            return true;
         }
         catch (Exception ex)
         {
@@ -106,7 +107,7 @@ public class CategoryController : ControllerBase
             return;
         }
 
-        CategoryView.ShowSearchResultsAsync(products);
+        await CategoryView.ShowSearchResultsAsync(products);
         await HandleSearchInputAsync(products);
     }
 
